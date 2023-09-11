@@ -7,38 +7,49 @@ internal static class Program
 		Console.WriteLine("Demo of PicoArgs.cs class, eg:");
 		Console.WriteLine("PicoArgs-dotnet.exe --raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
 
-		//var pico = new PicoArgs("--raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
-		var pico = new PicoArgs(args);
-
-		var help = pico.Contains("-h", "-?", "--help");
-
-		// if we want help, just bail here
-		if (help)
+		try
 		{
-			Console.WriteLine(HelpMessage);
-			return;
+			//var pico = new PicoArgs("--raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
+			var pico = new PicoArgs(args);
+
+			var help = pico.Contains("-h", "-?", "--help");
+
+			// if we want help, just bail here
+			if (help)
+			{
+				Console.WriteLine(HelpMessage);
+				return;
+			}
+
+			// parse the rest of the command line
+			var raw = pico.Contains("-r", "--raw");
+			var files = pico.GetMultipleParams("-f", "--file");
+			var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
+
+			// check for extra args
+			pico.CheckArgsConsumed();
+
+			// show the results
+			if (files.Length == 0)
+			{
+				Console.WriteLine(HelpMessage);
+				Console.WriteLine("\r\nNo files specified");
+				return;
+			}
+
+			var filesstr = string.Join(", ", files);
+			Console.WriteLine($"raw: {raw}");
+			Console.WriteLine($"files: {filesstr}");
+			Console.WriteLine($"exclude: {exclude}");
 		}
-
-		// parse the rest of the command line
-		var raw = pico.Contains("-r", "--raw");
-		var files = pico.GetMultipleParams("-f", "--file");
-		var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
-
-		// check for extra args
-		pico.CheckArgsConsumed();
-
-		// show the results
-		if (files.Length == 0)
+		catch (PicoArgsException ex)
 		{
-			Console.WriteLine(HelpMessage);
-			Console.WriteLine("\r\nNo files specified");
-			return;
+			Console.WriteLine($"PICOARGS ERROR: {ex.Message}");
 		}
-
-		var filesstr = string.Join(", ", files);
-		Console.WriteLine($"raw: {raw}");
-		Console.WriteLine($"files: {filesstr}");
-		Console.WriteLine($"exclude: {exclude}");
+		catch (Exception ex)
+		{
+			Console.WriteLine($"ERROR: {ex.Message}");
+		}
 	}
 
 	private const string HelpMessage =
