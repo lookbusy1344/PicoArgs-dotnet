@@ -10,7 +10,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Supports flags, options and positional arguments
 - Supports short and long options
 - Supports multiple values for options
-- Tidy API
+- Tiny API, about 120 lines of code
 - Written for .NET 7 but should work with earlier versions
 
 Order of argument consumption is important. Once consumed an argument taken from the list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```CheckArgsConsumed()```.

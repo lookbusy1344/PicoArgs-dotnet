@@ -5,22 +5,17 @@ using System.Text.RegularExpressions;
 namespace PicoArgs_dotnet;
 
 /* PICOARGS_DOTNET:
-	using var pico = new PicoArgsDisposable(args);
+	using var pico = new PicoArgs(args);
 
-	var help = pico.Contains("-h", "-?", "--help");									// true if any of these switches are present
-	var pattern = pico.GetParamOrDefault(new[] { "-p", "--pattern" }, "*.txt");		// default if not present
-	var exclude = pico.GetParamOpt("-e", "--exclude");								// optional parameter
-	var path = pico.GetParam("-p", "--path");										// mandatory parameter, throws if not present
+	bool help = pico.Contains("-h", "-?", "--help");									// true if any of these switches are present
+	string pattern = pico.GetParamOpt("-p", "--pattern") ?? "*.txt";
+	string requiredpath = pico.GetParam("-p", "--path");										// mandatory parameter, throws if not present
 
 
   INSPIRED BY PICO-ARGS FOR RUST:
   https://github.com/RazrFalcon/pico-args
 
-    let mut pargs = pico_args::Arguments::from_env();
-    let raw = pargs.contains(["-r", "--raw"]);
-    let help = pargs.contains(["-h", "--help"]);
-    let foldera: String = pargs.value_from_str(["-a", "--foldera"]);
- */
+*/
 
 /// <summary>
 /// Tiny command line argument parser
