@@ -53,8 +53,8 @@ internal static class Program
 	}
 
 	/// <summary>
+	/// Alternative usage to the example in Main() above.
 	/// This wraps the parsing of the command line, and returns the results as a tuple.
-	/// Alternative usage to the examp in Main() above.
 	/// </summary>
 	private static (bool help, DirectoryInfo folder, string pattern, bool verbose) ParseCommandLineWrapper(string[] args)
 	{
@@ -73,7 +73,6 @@ internal static class Program
 
 		return (false, folder, pattern, verbose);
 	}
-
 
 	private const string HelpMessage =
 @"Usage: PicoArgs-dotnet.exe [options]

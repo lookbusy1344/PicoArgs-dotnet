@@ -14,10 +14,10 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Tiny API, about 120 lines of code
 - Written for .NET 7 but should work with earlier versions
 
-Order of argument consumption is important. Once consumed an argument taken from the list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```CheckArgsConsumed()```.
+Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```CheckArgsConsumed()```.
 
 ## Usage
-No nuget packages, just add ```PicoArgs.cs``` to your project.
+No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code:
 
 ```csharp
 	var pico = new PicoArgs(args); // construct with command line arguments string[]

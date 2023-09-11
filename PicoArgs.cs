@@ -7,9 +7,10 @@ namespace PicoArgs_dotnet;
 /* PICOARGS_DOTNET:
 	using var pico = new PicoArgs(args);
 
-	bool help = pico.Contains("-h", "-?", "--help");									// true if any of these switches are present
-	string pattern = pico.GetParamOpt("-p", "--pattern") ?? "*.txt";
-	string requiredpath = pico.GetParam("-p", "--path");										// mandatory parameter, throws if not present
+	bool help = pico.Contains("-h", "-?", "--help");					// true if any of these switches are present
+	string pattern = pico.GetParamOpt("-p", "--pattern") ?? "*.txt";	// optional parameter
+	string requiredpath = pico.GetParam("-p", "--path");				// mandatory parameter, throws if not present
+	string[] files = pico.GetMultipleParams("-f", "--file");			// multiple parameters returned in string[]
 
 
   INSPIRED BY PICO-ARGS FOR RUST:
