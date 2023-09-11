@@ -52,6 +52,29 @@ internal static class Program
 		}
 	}
 
+	/// <summary>
+	/// This wraps the parsing of the command line, and returns the results as a tuple.
+	/// Alternative usage to the examp in Main() above.
+	/// </summary>
+	private static (bool help, DirectoryInfo folder, string pattern, bool verbose) ParseCommandLineWrapper(string[] args)
+	{
+		// this will throw when it leaves scope if there are any unused arguments
+		using var pico = new PicoArgsDisposable(args);
+
+		var help = pico.Contains("-h", "-?", "--help");
+
+		// if we want help, just bail here, dont bother parsing the rest
+		if (help) return (true, null!, null!, false);
+
+		// parse the rest of the command line
+		var folder = new DirectoryInfo(pico.GetParamOpt("-f", "--folder") ?? ".");
+		var pattern = pico.GetParamOpt("-p", "--pattern") ?? "*.txt";
+		var verbose = pico.Contains("-v", "--verbose");
+
+		return (false, folder, pattern, verbose);
+	}
+
+
 	private const string HelpMessage =
 @"Usage: PicoArgs-dotnet.exe [options]
 
