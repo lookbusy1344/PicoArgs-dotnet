@@ -1,4 +1,4 @@
 /bin/
 /obj/
 /.vs/
-/ZipDir.csproj.user
+/*.csproj.user
