@@ -20,13 +20,13 @@ Order of argument consumption is important. Once consumed an argument is removed
 No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code:
 
 ```csharp
-	var pico = new PicoArgs(args); // construct with command line arguments string[]
+var pico = new PicoArgs(args); // construct with command line arguments string[]
 
-	bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
-	string[] files = pico.GetMultipleParams("-f", "--file"); // returns string[] with zero length if none found
-	string exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude"; // specifying a default
+bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
+string[] files = pico.GetMultipleParams("-f", "--file"); // returns string[] with zero length if none found
+string exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude"; // specifying a default
 
-	pico.CheckArgsConsumed(); // check for extra unwanted arguments, throw is any are left over
+pico.CheckArgsConsumed(); // check for extra unwanted arguments, throw is any are left over
 
 ```
 
@@ -35,13 +35,15 @@ More examples can be found in the ```Program.cs``` file.
 For testing, you can also construct from a single string. This uses a regex so is excluded in RELEASE builds:
 
 ```csharp
-    var pico = new PicoArgs("-r -f file1.txt -f \"file 2.txt\" -e example-exclude");
+var pico = new PicoArgs("-r -f file1.txt -f \"file 2.txt\" -e example-exclude");
 ```
 
 There is also a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may or may not be to your taste:
 
 ```csharp
-    using var pico = new PicoArgsDisposable(args);
-    bool raw = pico.Contains("-r", "--raw");
-    // Dispose called to check for extra arguments when pico goes out of scope
+using (var pico = new PicoArgsDisposable(args))
+{
+	bool raw = pico.Contains("-r", "--raw");
+	// Dispose called to check for extra arguments when pico goes out of scope
+}
 ```
