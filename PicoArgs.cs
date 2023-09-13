@@ -8,7 +8,7 @@ namespace PicoArgs_dotnet;
 	using var pico = new PicoArgs(args);
 
 	bool help = pico.Contains("-h", "-?", "--help");					// true if any of these switches are present
-	string pattern = pico.GetParamOpt("-p", "--pattern") ?? "*.txt";	// optional parameter
+	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";	// optional parameter
 	string requiredpath = pico.GetParam("-p", "--path");				// mandatory parameter, throws if not present
 	string[] files = pico.GetMultipleParams("-f", "--file");			// multiple parameters returned in string[]
 
