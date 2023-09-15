@@ -74,12 +74,13 @@ internal static class Program
 		return (false, folder, pattern, verbose);
 	}
 
-	private const string HelpMessage =
-@"Usage: PicoArgs-dotnet.exe [options]
+	private const string HelpMessage = """
+		Usage: PicoArgs-dotnet.exe [options]
 
-Options:
-  -f, --file <filename>     File(s) to search (required)
-  -e, --exclude <pattern>   Exclude pattern (default 'example-exclude')
-  -r, --raw                 Raw output
-  -h, --help, -?            Help information";
+		Options:
+		  -f, --file <filename>     File(s) to search (required)
+		  -e, --exclude <pattern>   Exclude pattern (default 'example-exclude')
+		  -r, --raw                 Raw output
+		  -h, --help, -?            Help information
+		""";
 }
