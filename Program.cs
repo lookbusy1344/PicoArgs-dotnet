@@ -26,8 +26,8 @@ internal static class Program
 			var files = pico.GetMultipleParams("-f", "--file");
 			var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
 
-			// check for extra args
-			pico.CheckArgsConsumed();
+			// we have finished, make sure there are no unused arguments
+			pico.Finished();
 
 			// show the results
 			if (files.Length == 0)

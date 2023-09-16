@@ -4,13 +4,17 @@ using System.Text.RegularExpressions;
 
 namespace PicoArgs_dotnet;
 
-/* PICOARGS_DOTNET:
+/* PICOARGS_DOTNET usage:
+
 	using var pico = new PicoArgs(args);
 
-	bool help = pico.Contains("-h", "-?", "--help");					// true if any of these switches are present
+	bool verbose = pico.Contains("-v", "--verbose");					// true if any of these switches are present
 	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";	// optional parameter
 	string requiredpath = pico.GetParam("-p", "--path");				// mandatory parameter, throws if not present
 	string[] files = pico.GetMultipleParams("-f", "--file");			// multiple parameters returned in string[]
+	string command = pico.GetCommand();									// first parameter, throws if not present
+
+	pico.Finished();													// We are done. Throw if there are any unused parameters
 
 
   INSPIRED BY PICO-ARGS FOR RUST:
@@ -24,6 +28,7 @@ namespace PicoArgs_dotnet;
 public class PicoArgs
 {
 	private readonly List<string> args;
+	private bool finished;
 
 	/// <summary>
 	/// Build a PicoArgs from the command line arguments
@@ -42,6 +47,7 @@ public class PicoArgs
 	/// </summary>
 	public bool Contains(params string[] options)
 	{
+		CheckFinished();
 		if (options == null || options.Length == 0)
 			throw new ArgumentException("Must specify at least one option", nameof(options));
 
@@ -71,6 +77,7 @@ public class PicoArgs
 	/// </summary>
 	public string GetParam(params string[] options)
 	{
+		CheckFinished();
 		var s = GetParamOpt(options);
 		return s ?? throw new PicoArgsException($"Expected value for \"{string.Join(", ", options)}\"");
 	}
@@ -81,6 +88,7 @@ public class PicoArgs
 	/// </summary>
 	public string[] GetMultipleParams(params string[] options)
 	{
+		CheckFinished();
 		var result = new List<string>();
 		while (true)
 		{
@@ -98,6 +106,7 @@ public class PicoArgs
 	/// </summary>
 	public string? GetParamOpt(params string[] options)
 	{
+		CheckFinished();
 		if (options == null || options.Length == 0)
 			throw new ArgumentException("Must specify at least one option", nameof(options));
 
@@ -134,6 +143,7 @@ public class PicoArgs
 	/// </summary>
 	public string GetCommand()
 	{
+		CheckFinished();
 		if (args.Count == 0) throw new PicoArgsException("Expected command");
 
 		// check for a switch
@@ -151,12 +161,28 @@ public class PicoArgs
 	public IReadOnlyList<string> UnconsumedArgs => args;
 
 	/// <summary>
+	/// Return true if there are no unused command line parameters
+	/// </summary>
+	public bool IsEmpty => args.Count == 0;
+
+	/// <summary>
 	/// Throw an exception if there are any unused command line parameters
 	/// </summary>
-	public void CheckArgsConsumed()
+	public void Finished()
 	{
 		if (args.Count > 0)
 			throw new PicoArgsException($"Unrecognised parameter(s): {string.Join(", ", args)}");
+
+		finished = true;
+	}
+
+	/// <summary>
+	/// Ensure that Finished() has not been called
+	/// </summary>
+	private void CheckFinished()
+	{
+		if (finished)
+			throw new PicoArgsException("Cannot use PicoArgs after calling Finished()");
 	}
 }
 
@@ -175,9 +201,18 @@ public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 #endif
 
 	/// <summary>
+	/// If true, supress the check for unused command line parameters
+	/// </summary>
+	public bool SuppressCheck { get; set; }
+
+	/// <summary>
 	/// Throw an exception if there are any unused command line parameters
 	/// </summary>
-	public void Dispose() => CheckArgsConsumed();
+	public void Dispose()
+	{
+		if (!SuppressCheck)
+			Finished();
+	}
 }
 
 /// <summary>

@@ -14,7 +14,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Tiny API, about 120 lines of code
 - Written for .NET 7 but should work with earlier versions
 
-Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```CheckArgsConsumed()```.
+Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```Finished()```.
 
 ## Usage
 No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code:
@@ -26,7 +26,7 @@ bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is prese
 string[] files = pico.GetMultipleParams("-f", "--file"); // returns string[] with zero length if none found
 string exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude"; // specifying a default
 
-pico.CheckArgsConsumed(); // check for extra unwanted arguments, throw is any are left over
+pico.Finished(); // we are finished, check for extra unwanted arguments & throw is any are left over
 
 ```
 
@@ -41,9 +41,8 @@ var pico = new PicoArgs("-r -f file1.txt -f \"file 2.txt\" -e example-exclude");
 There is also a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may or may not be to your taste:
 
 ```csharp
-using (var pico = new PicoArgsDisposable(args))
-{
-	bool raw = pico.Contains("-r", "--raw");
-	// Dispose called to check for extra arguments when pico goes out of scope
-}
+using var pico = new PicoArgsDisposable(args);
+
+bool raw = pico.Contains("-r", "--raw");
+// Finished() called to check for extra arguments, when pico goes out of scope
 ```
