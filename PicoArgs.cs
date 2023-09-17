@@ -131,8 +131,7 @@ public class PicoArgs
 			throw new PicoArgsException($"Value for \"{option}\" is \"{str}\"");
 
 		// consume the switch and the value
-		args.RemoveAt(index);
-		args.RemoveAt(index); // index is now the previous index+1
+		args.RemoveRange(index, 2);
 
 		// return the value
 		return str;
