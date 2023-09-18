@@ -6,15 +6,15 @@ namespace PicoArgs_dotnet;
 
 /* PICOARGS_DOTNET usage:
 
-	using var pico = new PicoArgs(args);
+	var pico = new PicoArgs(args);
 
-	bool verbose = pico.Contains("-v", "--verbose");					// true if any of these switches are present
+	bool verbose = pico.Contains("-v", "--verbose");			// true if any of these switches are present
 	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";	// optional parameter
-	string requiredpath = pico.GetParam("-p", "--path");				// mandatory parameter, throws if not present
-	string[] files = pico.GetMultipleParams("-f", "--file");			// multiple parameters returned in string[]
-	string command = pico.GetCommand();									// first parameter, throws if not present
+	string requiredpath = pico.GetParam("-p", "--path");			// mandatory parameter, throws if not present
+	string[] files = pico.GetMultipleParams("-f", "--file");		// multiple parameters returned in string[]
+	string command = pico.GetCommand();					// first parameter, throws if not present
 
-	pico.Finished();													// We are done. Throw if there are any unused parameters
+	pico.Finished();							// We are done. Throw if there are any unused parameters
 
 
   INSPIRED BY PICO-ARGS FOR RUST:
