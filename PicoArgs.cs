@@ -7,6 +7,8 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
+    Version 1.0.1 - 23 Sept 2023
+
     Example usage:
 
 	var pico = new PicoArgs(args);
