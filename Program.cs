@@ -52,6 +52,8 @@ internal static class Program
 		}
 	}
 
+#pragma warning disable IDE0051 // Remove unused private members
+
 	/// <summary>
 	/// Alternative usage to the example in Main() above.
 	/// This wraps the parsing of the command line, and returns the results as a tuple.
