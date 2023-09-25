@@ -27,23 +27,28 @@ namespace PicoArgs_dotnet;
 */
 
 /// <summary>
+/// a key and optional identified value eg --key=value
+/// </summary>
+public record class KeyValue(string Key, string? Value);
+
+/// <summary>
 /// Tiny command line argument parser
 /// </summary>
 public class PicoArgs
 {
-	private readonly List<string> args;
+	private readonly List<KeyValue> args;
 	private bool finished;
 
 	/// <summary>
 	/// Build a PicoArgs from the command line arguments
 	/// </summary>
-	public PicoArgs(string[] args) => this.args = args.ToList();
+	public PicoArgs(IEnumerable<string> args) => this.args = args.Select(a => new KeyValue(a, null)).ToList();
 
 #if DEBUG
 	/// <summary>
 	/// Build a PicoArgs from a single string, for testing
 	/// </summary>
-	public PicoArgs(string args) => this.args = StringSplitter.SplitParams(args);
+	public PicoArgs(string args) : this(StringSplitter.SplitParams(args)) { }
 #endif
 
 	/// <summary>
@@ -62,7 +67,7 @@ public class PicoArgs
 		{
 			if (!o.StartsWith('-')) throw new ArgumentException("Must start with -", nameof(options));
 
-			var index = args.IndexOf(o);
+			var index = args.FindIndex(a => a.Key == o);
 			if (index >= 0)
 			{
 				// found switch so consume it and return
@@ -121,7 +126,7 @@ public class PicoArgs
 			if (!o.StartsWith('-')) throw new ArgumentException("Must start with -", nameof(options));
 
 		// do we have this switch on command line?
-		var option = args.Find(a => options.Contains(a));
+		var option = args.Find(a => options.Contains(a.Key));
 		if (option == null) return null;
 
 		// is it the last parameter?
@@ -131,14 +136,12 @@ public class PicoArgs
 
 		// is the next parameter another switch? This might be ok, eg --text "--something"
 		var str = args[index + 1];
-		//if (str.StartsWith('-'))
-		//	throw new PicoArgsException($"Value for \"{option}\" is \"{str}\"");
 
 		// consume the switch and the value
 		args.RemoveRange(index, 2);
 
 		// return the value
-		return str;
+		return str.Key;
 	}
 
 	/// <summary>
@@ -150,7 +153,7 @@ public class PicoArgs
 		if (args.Count == 0) throw new PicoArgsException("Expected command");
 
 		// check for a switch
-		var cmd = args[0];
+		var cmd = args[0].Key;
 		if (cmd.StartsWith('-')) throw new PicoArgsException($"Expected command not \"{cmd}\"");
 
 		// consume the command, and return it
@@ -161,7 +164,7 @@ public class PicoArgs
 	/// <summary>
 	/// Return any unused command line parameters
 	/// </summary>
-	public IReadOnlyList<string> UnconsumedArgs => args;
+	public IReadOnlyList<KeyValue> UnconsumedArgs => args;
 
 	/// <summary>
 	/// Return true if there are no unused command line parameters
@@ -215,6 +218,34 @@ public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 	{
 		if (!SuppressCheck)
 			Finished();
+	}
+}
+
+internal static class Helpers
+{
+	/// <summary>
+	/// Index of a char in a string, or null if not found
+	/// </summary>
+	internal static int? IndexOf(string s, char c)
+	{
+		var i = s.IndexOf(c);
+		return i < 0 ? null : i;
+	}
+
+	/// <summary>
+	/// If the string starts and ends with the same quote, remove them
+	/// </summary>
+	internal static string TrimQuote(string s)
+	{
+		if (string.IsNullOrEmpty(s)) return s;
+		if (s.Length < 2) return s;
+
+		var c = s[0];
+		if (c is '\'' or '\"')
+			if (s[^1] == c)
+				return s[1..^1];    // if ends with same quote, remove them
+
+		return s;   // just return original string
 	}
 }
 
