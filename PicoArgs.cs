@@ -121,22 +121,33 @@ public class PicoArgs
 			if (!o.StartsWith('-')) throw new ArgumentException("Must start with -", nameof(options));
 
 		// do we have this switch on command line?
-		var option = args.Find(a => options.Contains(a.Key));
-		if (option == null) return null;
+		var index = args.FindIndex(a => options.Contains(a.Key));
+		if (index == -1) return null;
+
+		// check if this key has an identified value
+		var item = args[index];
+		if (item.Value != null)
+		{
+			args.RemoveAt(index);
+			return item.Value;
+		}
+
+		// otherwise, there is no identified value, so we need to look at the next parameter
 
 		// is it the last parameter?
-		var index = args.IndexOf(option);
 		if (index == args.Count - 1)
-			throw new PicoArgsException($"Expected value after \"{option}\"");
+			throw new PicoArgsException($"Expected value after \"{item.Key}\"");
 
-		// is the next parameter another switch? This might be ok, eg --text "--something"
-		var str = args[index + 1];
+		// grab and check the next parameter
+		var seconditem = args[index + 1];
+		if (seconditem.Value != null)
+			throw new PicoArgsException($"Cannot identify value for param \"{item.Key}\", followed by \"{seconditem.Key}\" and \"{seconditem.Value}\"");
 
-		// consume the switch and the value
+		// consume the switch and the seperate value
 		args.RemoveRange(index, 2);
 
 		// return the value
-		return str.Key;
+		return seconditem.Key;
 	}
 
 	/// <summary>
