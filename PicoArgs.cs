@@ -7,7 +7,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 1.0.2 - 24 Sept 2023
+    Version 1.0.99 - 25 Sept 2023
 
     Example usage:
 
@@ -37,7 +37,7 @@ public class PicoArgs
 	/// <summary>
 	/// Build a PicoArgs from the command line arguments
 	/// </summary>
-	public PicoArgs(IEnumerable<string> args) => this.args = args.Select(KeyValue.Build).ToList();
+	public PicoArgs(IEnumerable<string> args, bool recogniseequals = true) => this.args = args.Select(a => KeyValue.Build(a, recogniseequals)).ToList();
 
 #if DEBUG
 	/// <summary>
@@ -232,9 +232,12 @@ public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 /// </summary>
 public record class KeyValue(string Key, string? Value)
 {
-	public static KeyValue Build(string arg)
+	public static KeyValue Build(string arg, bool recogniseequals)
 	{
 		ArgumentNullException.ThrowIfNull(arg);
+
+		// if arg does not start with a dash, this cannot be a key+value eg --key=value vs key=value
+		if (!recogniseequals || !arg.StartsWith('-')) return new KeyValue(arg, null);
 
 		// locate positions of quotes and equals
 		var singlequote = IndexOf(arg, '\'') ?? int.MaxValue;

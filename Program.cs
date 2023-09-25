@@ -6,6 +6,7 @@ internal static class Program
 	{
 		Console.WriteLine("Demo of PicoArgs.cs class, eg:");
 		Console.WriteLine("PicoArgs-dotnet.exe --raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
+		Console.WriteLine("PicoArgs-dotnet.exe --raw -f=file1.txt -f=\"file 2.txt\" --file file3.txt --exclude=\"something else\"");
 
 		try
 		{
