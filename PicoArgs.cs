@@ -27,11 +27,6 @@ namespace PicoArgs_dotnet;
 */
 
 /// <summary>
-/// a key and optional identified value eg --key=value
-/// </summary>
-public record class KeyValue(string Key, string? Value);
-
-/// <summary>
 /// Tiny command line argument parser
 /// </summary>
 public class PicoArgs
@@ -42,7 +37,7 @@ public class PicoArgs
 	/// <summary>
 	/// Build a PicoArgs from the command line arguments
 	/// </summary>
-	public PicoArgs(IEnumerable<string> args) => this.args = args.Select(a => new KeyValue(a, null)).ToList();
+	public PicoArgs(IEnumerable<string> args) => this.args = args.Select(KeyValue.Build).ToList();
 
 #if DEBUG
 	/// <summary>
@@ -221,12 +216,34 @@ public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 	}
 }
 
-internal static class Helpers
+/// <summary>
+/// a key and optional identified value eg --key=value
+/// </summary>
+public record class KeyValue(string Key, string? Value)
 {
+	public static KeyValue Build(string arg)
+	{
+		ArgumentNullException.ThrowIfNull(arg);
+
+		// locate positions of quotes and equals
+		var singlequote = IndexOf(arg, '\'') ?? int.MaxValue;
+		var doublequote = IndexOf(arg, '\"') ?? int.MaxValue;
+		var eq = IndexOf(arg, '=');
+
+		if (eq < singlequote && eq < doublequote)
+		{
+			// if the equals is before the quotes, then split on the equals
+			var parts = arg.Split(new char[] { '=' }, 2);
+			return new KeyValue(parts[0], TrimQuote(parts[1]));
+		}
+		else
+			return new KeyValue(arg, null);
+	}
+
 	/// <summary>
 	/// Index of a char in a string, or null if not found
 	/// </summary>
-	internal static int? IndexOf(string s, char c)
+	private static int? IndexOf(string s, char c)
 	{
 		var i = s.IndexOf(c);
 		return i < 0 ? null : i;
@@ -235,7 +252,7 @@ internal static class Helpers
 	/// <summary>
 	/// If the string starts and ends with the same quote, remove them
 	/// </summary>
-	internal static string TrimQuote(string s)
+	private static string TrimQuote(string s)
 	{
 		if (string.IsNullOrEmpty(s)) return s;
 		if (s.Length < 2) return s;
