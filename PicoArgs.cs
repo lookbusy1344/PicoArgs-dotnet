@@ -228,7 +228,7 @@ public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 }
 
 /// <summary>
-/// a key and optional identified value eg --key=value
+/// a key and optional identified value eg --key=value becomes "--key" and "value"
 /// </summary>
 public record class KeyValue(string Key, string? Value)
 {
@@ -257,26 +257,25 @@ public record class KeyValue(string Key, string? Value)
 	/// <summary>
 	/// Index of a char in a string, or null if not found
 	/// </summary>
-	private static int? IndexOf(string s, char c)
+	private static int? IndexOf(string str, char c)
 	{
-		var i = s.IndexOf(c);
+		var i = str.IndexOf(c);
 		return i < 0 ? null : i;
 	}
 
 	/// <summary>
-	/// If the string starts and ends with the same quote, remove them
+	/// If the string starts and ends with the same quote, remove them eg "hello world" -> hello world
 	/// </summary>
-	private static string TrimQuote(string s)
+	private static string TrimQuote(string str)
 	{
-		if (string.IsNullOrEmpty(s)) return s;
-		if (s.Length < 2) return s;
+		if (string.IsNullOrEmpty(str) || str.Length < 2) return str;
 
-		var c = s[0];
+		var c = str[0];
 		if (c is '\'' or '\"')
-			if (s[^1] == c)
-				return s[1..^1];    // if ends with same quote, remove them
+			if (str[^1] == c)
+				return str[1..^1];    // if ends with same quote, remove them
 
-		return s;   // just return original string
+		return str;   // just return original string
 	}
 }
 
