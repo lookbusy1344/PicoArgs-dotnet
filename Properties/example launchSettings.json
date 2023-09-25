@@ -1,0 +1,23 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Normal": {
+      "commandName": "Project",
+      "commandLineArgs": "-f file1.txt -f file2.txt --exclude something"
+    },
+    "No params": {
+      "commandName": "Project"
+    },
+    "Rubbish": {
+      "commandName": "Project",
+      "commandLineArgs": "--rubbish"
+    },
+    "Normal equals": {
+      "commandName": "Project",
+      "commandLineArgs": "-f=file1.txt --file=\"file2.txt\" --exclude something"
+    }
+  }
+}
