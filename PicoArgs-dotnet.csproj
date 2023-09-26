@@ -27,4 +27,10 @@
 	<AnalysisModeUsage>All</AnalysisModeUsage>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="TestPicoArgs\**" />
+    <EmbeddedResource Remove="TestPicoArgs\**" />
+    <None Remove="TestPicoArgs\**" />
+  </ItemGroup>
+
 </Project>
