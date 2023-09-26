@@ -20,9 +20,22 @@ public class PicoTests
 		Assert.True(help);
 		Assert.False(absent);
 		Assert.Equal("something", another);
+		Assert.True(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "Multiple matches", Timeout = 1000)]
+	[Fact(DisplayName = "GetParamOpt test", Timeout = 1000)]
+	public void GetParamOptTest()
+	{
+		var pico = new PicoArgs("--help --another something");
+
+		var another = pico.GetParamOpt("--another");
+		var missing = pico.GetParamOpt("--missing");
+
+		Assert.Equal("something", another);
+		Assert.Null(missing);
+	}
+
+	[Fact(DisplayName = "GetMultipleParams test", Timeout = 1000)]
 	public void MultipleTest()
 	{
 		var expected = new string[] { "file.txt", "another.txt", "again.txt" };
@@ -32,9 +45,10 @@ public class PicoTests
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
+		Assert.False(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "Parameter not found", Timeout = 1000)]
+	[Fact(DisplayName = "GetParam - parameter not found", Timeout = 1000)]
 	public void NoParamFound()
 	{
 		var pico = new PicoArgs("-f file.txt");
@@ -43,7 +57,7 @@ public class PicoTests
 		Helpers.AssertPicoThrows(() =>
 		{
 			var files = pico.GetParam("--something");
-		}, "GetParam should throw when param missing", 10);
+		}, "GetParam() should throw when param missing", 10);
 	}
 
 	[Fact(DisplayName = "Using equals and complex value", Timeout = 1000)]
@@ -56,6 +70,7 @@ public class PicoTests
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
+		Assert.True(pico.IsEmpty);
 	}
 
 	[Fact(DisplayName = "Using equals and complex value, when not enabled", Timeout = 1000)]
@@ -76,13 +91,66 @@ public class PicoTests
 		var something = pico.Contains("--something");
 
 		Assert.True(something);
+		Assert.False(pico.IsEmpty);
 
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() =>
 		{
 			pico.Finished();
-		}, "Finished should throw when parameters are leftover", 60);
+		}, "Finished() should throw when parameters are leftover", 60);
 	}
 
-	// test GetCommand()
+	[Fact(DisplayName = "GetCommand test", Timeout = 1000)]
+	public void GetCommand()
+	{
+		var pico = new PicoArgs("--file file.txt -v PRINT");
+
+		var verbose = pico.Contains("-v", "--verbose");
+		var file = pico.GetParam("-f", "--file");
+		var print = pico.GetCommand();
+		pico.Finished();
+
+		Assert.True(verbose);
+		Assert.Equal("file.txt", file);
+		Assert.Equal("PRINT", print);
+		Assert.True(pico.IsEmpty);
+	}
+
+	[Fact(DisplayName = "Regex splitting", Timeout = 1000)]
+	public void RegexSplitting()
+	{
+		var expected = new string[] { "once", "upon", "a", "time", "in Hollywood" };
+		var pico = new PicoArgs("once upon a time \"in Hollywood\"");
+
+		var content = pico.UnconsumedArgs.Select(a => a.Key).ToArray();
+		var match = Helpers.CompareNames(expected, content);
+		Assert.True(match);
+	}
+
+	[Fact(DisplayName = "Key / value splitting in detail", Timeout = 1000)]
+	public void KVCheck()
+	{
+		var expected = new KeyValue[] { new KeyValue("--file", "file1.txt"), new KeyValue("--print", null),
+			new KeyValue("something", null), new KeyValue("--verbose", "yes") };
+		var pico = new PicoArgs("--file=file1.txt --print something --verbose=yes");
+
+		var match = expected.SequenceEqual(pico.UnconsumedArgs);
+
+		Assert.Equal(expected.Length, pico.UnconsumedArgs.Count);
+		Assert.True(match);
+	}
+
+	[Fact(DisplayName = "PicoArgsDisposable check", Timeout = 1000)]
+	public void DisposalCheck()
+	{
+#pragma warning disable CA2000 // Dispose objects before losing scope
+		var pico = new PicoArgsDisposable("-f file.txt --something");
+		var something = pico.Contains("--something");
+
+		Helpers.AssertPicoThrows(() =>
+		{
+			pico.Dispose();
+		}, "Dispose() should throw when parameters are leftover", 60);
+#pragma warning restore CA2000 // Dispose objects before losing scope
+	}
 }
