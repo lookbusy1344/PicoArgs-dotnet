@@ -2,6 +2,7 @@ using PicoArgs_dotnet;
 
 namespace TestPicoArgs;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0053 // Use expression body for lambda expression
 #pragma warning disable IDE0200 // Remove unnecessary lambda expression
 #pragma warning disable RCS1021 // Convert lambda expression body to expression body.
