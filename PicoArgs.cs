@@ -43,7 +43,7 @@ public class PicoArgs
 	/// <summary>
 	/// Build a PicoArgs from a single string, for testing
 	/// </summary>
-	public PicoArgs(string args) : this(StringSplitter.SplitParams(args)) { }
+	public PicoArgs(string args, bool recogniseequals = true) : this(StringSplitter.SplitParams(args), recogniseequals) { }
 #endif
 
 	/// <summary>
