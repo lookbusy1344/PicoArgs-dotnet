@@ -40,10 +40,10 @@ public class PicoTests
 		var pico = new PicoArgs("-f file.txt");
 
 		// this should throw an exception
-		Helpers.AssertThrows<PicoArgsException>(() =>
+		Helpers.AssertPicoThrows(() =>
 		{
 			var files = pico.GetParam("--something");
-		}, "GetParam should throw when param missing");
+		}, "GetParam should throw when param missing", 10);
 	}
 
 	[Fact(DisplayName = "Using equals and complex value", Timeout = 1000)]
@@ -78,10 +78,10 @@ public class PicoTests
 		Assert.True(something);
 
 		// this should throw an exception
-		Helpers.AssertThrows<PicoArgsException>(() =>
+		Helpers.AssertPicoThrows(() =>
 		{
 			pico.Finished();
-		}, "Finished should throw when parameters are leftover");
+		}, "Finished should throw when parameters are leftover", 60);
 	}
 
 	// test GetCommand()
