@@ -1,4 +1,8 @@
 # PicoArgs-dotnet
+
+[![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml)
+[![CodeQL](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/github-code-scanning/codeql)
+
 A tiny command line argument parser for dotnet, inspired by the Rust pico-args library https://github.com/RazrFalcon/pico-args
 
 Like the Rust library, this library is intended to be used for small command line tools, where you don't want to use a full blown argument parser like CommandLineParser https://github.com/commandlineparser/commandline
