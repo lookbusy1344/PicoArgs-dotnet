@@ -50,3 +50,11 @@ using var pico = new PicoArgsDisposable(args);
 bool raw = pico.Contains("-r", "--raw");
 // Finished() called to check for extra arguments, when pico goes out of scope
 ```
+
+## Tests
+
+[![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml)
+
+Tests are written using xUnit and can be run with `dotnet test`. There is also a Github Actions workflow which runs the tests on push and pull request.
+
+Tests need the main project to be built in `debug` mode.
