@@ -99,7 +99,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			result.Add(s);
 		}
 
-		return result.ToArray();
+		return [.. result];
 	}
 
 	/// <summary>
