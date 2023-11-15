@@ -29,15 +29,13 @@ namespace PicoArgs_dotnet;
 /// <summary>
 /// Tiny command line argument parser
 /// </summary>
-public class PicoArgs
+/// <remarks>
+/// Build a PicoArgs from the command line arguments
+/// </remarks>
+public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 {
-	private readonly List<KeyValue> args;
+	private readonly List<KeyValue> args = args.Select(a => KeyValue.Build(a, recogniseEquals)).ToList();
 	private bool finished;
-
-	/// <summary>
-	/// Build a PicoArgs from the command line arguments
-	/// </summary>
-	public PicoArgs(IEnumerable<string> args, bool recogniseEquals = true) => this.args = args.Select(a => KeyValue.Build(a, recogniseEquals)).ToList();
 
 #if DEBUG
 	/// <summary>
