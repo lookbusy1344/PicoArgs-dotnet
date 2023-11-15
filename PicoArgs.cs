@@ -196,6 +196,11 @@ public class PicoArgs
 		if (finished)
 			throw new PicoArgsException(70, "Cannot use PicoArgs after calling Finished()");
 	}
+
+	/// <summary>
+	/// Optimization for splitting key=value pairs
+	/// </summary>
+	internal static readonly char[] SplitOnChars = ['='];
 }
 
 /// <summary>
@@ -247,7 +252,7 @@ public readonly record struct KeyValue(string Key, string? Value)
 		if (eq < singleQuote && eq < doubleQuote)
 		{
 			// if the equals is before the quotes, then split on the equals
-			var parts = arg.Split(new char[] { '=' }, 2);
+			var parts = arg.Split(PicoArgs.SplitOnChars, 2);
 			return new KeyValue(parts[0], TrimQuote(parts[1]));
 		}
 		else
