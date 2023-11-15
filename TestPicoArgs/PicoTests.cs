@@ -131,8 +131,8 @@ public class PicoTests
 	[Fact(DisplayName = "Key / value splitting in detail", Timeout = 1000)]
 	public void KVCheck()
 	{
-		var expected = new KeyValue[] { new KeyValue("--file", "file1.txt"), new KeyValue("--print", null),
-			new KeyValue("something", null), new KeyValue("--verbose", "yes") };
+		var expected = new KeyValue[] { new("--file", "file1.txt"), new("--print", null),
+			new("something", null), new("--verbose", "yes") };
 		var pico = new PicoArgs("--file=file1.txt --print something --verbose=yes");
 
 		var match = expected.SequenceEqual(pico.UnconsumedArgs);
