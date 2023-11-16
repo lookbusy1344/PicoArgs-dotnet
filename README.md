@@ -16,7 +16,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - NO support for default help generation, you need to do this manually
 - NO support for conversions, all arguments are strings (all flags are bools) unless you convert them yourself
 - Tiny API, about 120 lines of code
-- Written for .NET 7 but should work with earlier versions
+- Written for .NET 8 but should work with earlier versions
 
 Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```Finished()```.
 

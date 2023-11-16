@@ -117,6 +117,24 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
+	[Fact(DisplayName = "GetCommandOpt test", Timeout = 1000)]
+	public void GetCommandOpt()
+	{
+		var pico = new PicoArgs("--file file.txt -v PRINT");
+
+		var verbose = pico.Contains("-v", "--verbose");
+		var file = pico.GetParam("-f", "--file");
+		var print = pico.GetCommand();
+		var notfound = pico.GetCommandOpt();
+		pico.Finished();
+
+		Assert.True(verbose);
+		Assert.Equal("file.txt", file);
+		Assert.Equal("PRINT", print);
+		Assert.Null(notfound);
+		Assert.True(pico.IsEmpty);
+	}
+
 	[Fact(DisplayName = "Regex splitting", Timeout = 1000)]
 	public void RegexSplitting()
 	{
