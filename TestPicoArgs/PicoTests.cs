@@ -117,6 +117,24 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
+	[Fact(DisplayName = "Missing command", Timeout = 1000)]
+	public void MissingCommand()
+	{
+		var pico = new PicoArgs("--file file.txt -v");
+
+		var verbose = pico.Contains("-v", "--verbose");
+		var file = pico.GetParam("-f", "--file");
+
+		Assert.True(verbose);
+		Assert.Equal("file.txt", file);
+
+		// this should throw an exception
+		Helpers.AssertPicoThrows(() =>
+		{
+			_ = pico.GetCommand();
+		}, "GetCommand() should throw when no command present", 40);
+	}
+
 	[Fact(DisplayName = "GetCommandOpt test", Timeout = 1000)]
 	public void GetCommandOpt()
 	{
@@ -125,7 +143,7 @@ public class PicoTests
 		var verbose = pico.Contains("-v", "--verbose");
 		var file = pico.GetParam("-f", "--file");
 		var print = pico.GetCommand();
-		var notfound = pico.GetCommandOpt();
+		var notfound = pico.GetCommandOpt();    // a command that is not present, so should be null
 		pico.Finished();
 
 		Assert.True(verbose);
