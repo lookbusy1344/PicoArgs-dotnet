@@ -387,6 +387,7 @@ dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA2100.severity = none
 dotnet_diagnostic.CA5394.severity = none
 dotnet_diagnostic.IDE0042.severity = none
+dotnet_diagnostic.CA1822.severity = none
 
 
 # For Microsoft.VisualStudio.Threading.Analyzers
