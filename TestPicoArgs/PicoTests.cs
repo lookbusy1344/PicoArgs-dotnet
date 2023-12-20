@@ -190,4 +190,23 @@ public class PicoTests
 		}, "Dispose() should throw when parameters are leftover", 60);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 	}
+
+	[Fact(DisplayName = "Unwanted switch value", Timeout = 1000)]
+	public void UnwantedSwitchValue()
+	{
+		// here "--verbose" is acceptable but "--verbose=yes" is not
+		var pico = new PicoArgs("--verbose=yes --something");
+
+		var something = pico.Contains("--something");
+		var notpresent = pico.Contains("--notpresent");
+
+		Assert.True(something);
+		Assert.False(notpresent);
+
+		// this should throw an exception
+		Helpers.AssertPicoThrows(() =>
+		{
+			var verbose = pico.Contains("-v", "--verbose");
+		}, "Contains() should throw when unwanted switch value is present", 80);
+	}
 }
