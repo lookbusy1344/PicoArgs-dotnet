@@ -74,6 +74,34 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
+	[Fact(DisplayName = "Valid quoted values", Timeout = 1000)]
+	public void QuotedValues()
+	{
+		var expected = new string[] { "item1", "item2", "item3" };
+		//var pico = new PicoArgs("--file=item1 --file=\"item2\" --file='item3'"); ** this does not parse as a single string!
+		var pico = new PicoArgs(["--file=item1", "--file=\"item2\"", "--file='item3'"]);
+
+		var files = pico.GetMultipleParams("--file");
+
+		var match = Helpers.CompareNames(expected, files);
+		Assert.True(match);
+		Assert.True(pico.IsEmpty);
+	}
+
+	[Fact(DisplayName = "Invalid quoted values", Timeout = 1000)]
+	public void InvalidQuotedValues()
+	{
+		// these quotes do not match, so are not parsed
+		var expected = new string[] { "\"item1'", "'item2\"" };
+		var pico = new PicoArgs(["--file=\"item1'", "--file='item2\""]);
+
+		var files = pico.GetMultipleParams("--file");
+
+		var match = Helpers.CompareNames(expected, files);
+		Assert.True(match);
+		Assert.True(pico.IsEmpty);
+	}
+
 	[Fact(DisplayName = "Using equals and complex value, when not enabled", Timeout = 1000)]
 	public void ComplexValueFail()
 	{
