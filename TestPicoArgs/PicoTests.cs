@@ -1,4 +1,4 @@
-using PicoArgs_dotnet;
+﻿using PicoArgs_dotnet;
 
 namespace TestPicoArgs;
 
@@ -12,7 +12,7 @@ public class PicoTests
 	[Fact(DisplayName = "Basic test", Timeout = 1000)]
 	public void BasicTest()
 	{
-		var pico = new PicoArgs("--help --another something");
+		var pico = SplitArgs.BuildFromSingleString("--help --another something");
 
 		var help = pico.Contains("-h", "-?", "--help");
 		var absent = pico.Contains("-a", "-b", "--absent");
@@ -27,7 +27,7 @@ public class PicoTests
 	[Fact(DisplayName = "GetParamOpt test", Timeout = 1000)]
 	public void GetParamOptTest()
 	{
-		var pico = new PicoArgs("--help --another something");
+		var pico = SplitArgs.BuildFromSingleString("--help --another something");
 
 		var another = pico.GetParamOpt("--another");
 		var missing = pico.GetParamOpt("--missing");
@@ -40,7 +40,7 @@ public class PicoTests
 	public void MultipleTest()
 	{
 		var expected = new string[] { "file.txt", "another.txt", "again.txt" };
-		var pico = new PicoArgs("-f file.txt --junk xxx --file another.txt -f again.txt");
+		var pico = SplitArgs.BuildFromSingleString("-f file.txt --junk xxx --file another.txt -f again.txt");
 
 		var files = pico.GetMultipleParams("-f", "--file");
 
@@ -52,7 +52,7 @@ public class PicoTests
 	[Fact(DisplayName = "GetParam - parameter not found", Timeout = 1000)]
 	public void NoParamFound()
 	{
-		var pico = new PicoArgs("-f file.txt");
+		var pico = SplitArgs.BuildFromSingleString("-f file.txt");
 
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() =>
@@ -65,7 +65,7 @@ public class PicoTests
 	public void ComplexValue()
 	{
 		var expected = new string[] { "file.txt", "-something=else" };
-		var pico = new PicoArgs("--file=file.txt --file=-something=else");
+		var pico = SplitArgs.BuildFromSingleString("--file=file.txt --file=-something=else");
 
 		var files = pico.GetMultipleParams("-f", "--file");
 
@@ -78,7 +78,7 @@ public class PicoTests
 	public void ComplexValueFail()
 	{
 		//var expected = new string[] { "file.txt", "-something=else" };
-		var pico = new PicoArgs("--file=file.txt --file=-something=else", false);
+		var pico = SplitArgs.BuildFromSingleString("--file=file.txt --file=-something=else", false);
 
 		var files = pico.GetMultipleParams("-f", "--file");
 
@@ -88,7 +88,7 @@ public class PicoTests
 	[Fact(DisplayName = "Leftover parameter", Timeout = 1000)]
 	public void LeftoverParam()
 	{
-		var pico = new PicoArgs("-f file.txt --something");
+		var pico = SplitArgs.BuildFromSingleString("-f file.txt --something");
 		var something = pico.Contains("--something");
 
 		Assert.True(something);
@@ -104,7 +104,7 @@ public class PicoTests
 	[Fact(DisplayName = "GetCommand test", Timeout = 1000)]
 	public void GetCommand()
 	{
-		var pico = new PicoArgs("--file file.txt -v PRINT");
+		var pico = SplitArgs.BuildFromSingleString("--file file.txt -v PRINT");
 
 		var verbose = pico.Contains("-v", "--verbose");
 		var file = pico.GetParam("-f", "--file");
@@ -117,11 +117,47 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "Regex splitting", Timeout = 1000)]
+	[Fact(DisplayName = "Missing command")]
+	public void MissingCommand()
+	{
+		var pico = SplitArgs.BuildFromSingleString("--file file.txt -v");
+
+		var verbose = pico.Contains("-v", "--verbose");
+		var file = pico.GetParam("-f", "--file");
+
+		Assert.True(verbose);
+		Assert.Equal("file.txt", file);
+
+		// this should throw an exception
+		Helpers.AssertPicoThrows(() =>
+		{
+			_ = pico.GetCommand();
+		}, "GetCommand() should throw when no command present", 40);
+	}
+
+	[Fact(DisplayName = "GetCommandOpt test")]
+	public void GetCommandOpt()
+	{
+		var pico = SplitArgs.BuildFromSingleString("--file file.txt -v PRINT");
+
+		var verbose = pico.Contains("-v", "--verbose");
+		var file = pico.GetParam("-f", "--file");
+		var print = pico.GetCommand();
+		var notfound = pico.GetCommandOpt();    // a command that is not present, so should be null
+		pico.Finished();
+
+		Assert.True(verbose);
+		Assert.Equal("file.txt", file);
+		Assert.Equal("PRINT", print);
+		Assert.Null(notfound);
+		Assert.True(pico.IsEmpty);
+	}
+
+	[Fact(DisplayName = "Regex splitting")]
 	public void RegexSplitting()
 	{
 		var expected = new string[] { "once", "upon", "a", "time", "in Hollywood" };
-		var pico = new PicoArgs("once upon a time \"in Hollywood\"");
+		var pico = SplitArgs.BuildFromSingleString("once upon a time \"in Hollywood\"");
 
 		var content = pico.UnconsumedArgs.Select(a => a.Key).ToArray();
 		var match = Helpers.CompareNames(expected, content);
@@ -133,7 +169,7 @@ public class PicoTests
 	{
 		var expected = new KeyValue[] { new KeyValue("--file", "file1.txt"), new KeyValue("--print", null),
 			new KeyValue("something", null), new KeyValue("--verbose", "yes") };
-		var pico = new PicoArgs("--file=file1.txt --print something --verbose=yes");
+		var pico = SplitArgs.BuildFromSingleString("--file=file1.txt --print something --verbose=yes");
 
 		var match = expected.SequenceEqual(pico.UnconsumedArgs);
 
@@ -145,7 +181,7 @@ public class PicoTests
 	public void DisposalCheck()
 	{
 #pragma warning disable CA2000 // Dispose objects before losing scope
-		var pico = new PicoArgsDisposable("-f file.txt --something");
+		var pico = SplitArgs.BuildDisposableFromSingleString("-f file.txt --something");
 		var something = pico.Contains("--something");
 
 		Helpers.AssertPicoThrows(() =>
@@ -153,5 +189,24 @@ public class PicoTests
 			pico.Dispose();
 		}, "Dispose() should throw when parameters are leftover", 60);
 #pragma warning restore CA2000 // Dispose objects before losing scope
+	}
+
+	[Fact(DisplayName = "Unwanted switch value")]
+	public void UnwantedSwitchValue()
+	{
+		// here "--verbose" is acceptable but "--verbose=yes" is not
+		var pico = SplitArgs.BuildFromSingleString("--verbose=yes --something");
+
+		var something = pico.Contains("--something");
+		var notpresent = pico.Contains("--notpresent");
+
+		Assert.True(something);
+		Assert.False(notpresent);
+
+		// this should throw an exception
+		Helpers.AssertPicoThrows(() =>
+		{
+			var verbose = pico.Contains("-v", "--verbose");
+		}, "Contains() should throw when unwanted switch value is present", 80);
 	}
 }

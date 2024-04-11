@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using PicoArgs_dotnet;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace TestPicoArgs;
@@ -8,7 +9,20 @@ namespace TestPicoArgs;
 
 internal static class SplitArgs
 {
-	internal static string[] SplitArgumentsLine(string line) => CommandLineToArgvW($"echo {line}").Skip(1).ToArray();
+	/// <summary>
+	/// Build a PicoArgs from a single command line arguments
+	/// </summary>
+	internal static PicoArgs BuildFromSingleString(string line, bool recogniseEquals = true) => new(SplitArgumentsLine(line), recogniseEquals);
+
+	/// <summary>
+	/// Build a PicoArgsDisposable from a single command line arguments
+	/// </summary>
+	internal static PicoArgsDisposable BuildDisposableFromSingleString(string line) => new(SplitArgumentsLine(line));
+
+	/// <summary>
+	/// Split a command line into arguments (adds "echo" to the front to handle the case where the first argument is quoted)
+	/// </summary>
+	internal static IEnumerable<string> SplitArgumentsLine(string line) => CommandLineToArgvW($"echo {line}").Skip(1);
 
 	/**
 	 * C# equivalent of CommandLineToArgvW
