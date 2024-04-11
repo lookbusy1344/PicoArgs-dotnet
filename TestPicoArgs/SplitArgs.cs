@@ -8,28 +8,23 @@ namespace TestPicoArgs;
 
 internal static class SplitArgs
 {
-	internal static string[] SplitArgumentsLine(string line)
-	{
-		return CommandLineToArgvW("echo " + line).Skip(1).ToArray();
-	}
+	internal static string[] SplitArgumentsLine(string line) => CommandLineToArgvW($"echo {line}").Skip(1).ToArray();
 
 	/**
 	 * C# equivalent of CommandLineToArgvW
 	 * Translated from https://source.winehq.org/git/wine.git/blob/HEAD:/dlls/shcore/main.c#l264
 	 */
-	public static string[] CommandLineToArgvW(string cmdline)
+	private static string[] CommandLineToArgvW(string cmdline)
 	{
-		if ((cmdline = cmdline.Trim()).Length == 0)
-		{
-			return new string[0];
-		}
+		if ((cmdline = cmdline.Trim()).Length == 0) return [];
+
 		var len = cmdline.Length;
-		var argc = 0;
 		var i = 0;
 		var s = cmdline[i];
-		var END = '\0';
-		/* The first argument, the executable path, follows special rules */
-		argc = 1;
+		const char END = '\0';
+
+		// The first argument, the executable path, follows special rules
+		var argc = 1;
 		if (s == '"')
 		{
 			do
@@ -41,18 +36,17 @@ internal static class SplitArgs
 		}
 		else
 		{
-			while (s != END && s != ' ' && s != '\t')
+			while (s is not END and not ' ' and not '\t')
 			{
 				s = ++i < len ? cmdline[i] : END;
 			}
 		}
-		/* skip to the first argument, if any */
+		// skip to the first argument, if any
 		while (s is ' ' or '\t')
 			s = ++i < len ? cmdline[i] : END;
-		if (s != END)
-			argc++;
+		if (s != END) argc++;
 
-		/* Analyze the remaining arguments */
+		// Analyze the remaining arguments
 		var qcount = 0; // quote count
 		var bcount = 0; // backslash count
 		while (i < len)
@@ -60,45 +54,49 @@ internal static class SplitArgs
 			s = cmdline[i];
 			if ((s == ' ' || s == '\t') && qcount == 0)
 			{
-				/* skip to the next argument and count it if any */
+				// skip to the next argument and count it if any
 				do
 				{
 					s = ++i < len ? cmdline[i] : END;
 				} while (s is ' ' or '\t');
-				if (s != END)
-					argc++;
+
+				if (s != END) argc++;
 				bcount = 0;
 			}
 			else if (s == '\\')
 			{
-				/* '\', count them */
+				// '\', count them
 				bcount++;
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
 				s = ++i < len ? cmdline[i] : END;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
 			}
 			else if (s == '"')
 			{
-				/* '"' */
+				// '"'
 				if ((bcount & 1) == 0)
-					qcount++; /* unescaped '"' */
+					qcount++; // unescaped '"'
 				s = ++i < len ? cmdline[i] : END;
 				bcount = 0;
-				/* consecutive quotes, see comment in copying code below */
+				// consecutive quotes, see comment in copying code below
 				while (s == '"')
 				{
 					qcount++;
 					s = ++i < len ? cmdline[i] : END;
 				}
-				qcount = qcount % 3;
-				if (qcount == 2)
-					qcount = 0;
+				qcount %= 3;
+				if (qcount == 2) qcount = 0;
 			}
 			else
 			{
-				/* a regular character */
+				// a regular character
 				bcount = 0;
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
 				s = ++i < len ? cmdline[i] : END;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
 			}
 		}
+
 		var argv = new string[argc];
 		var sb = new StringBuilder();
 		i = 0;
@@ -112,20 +110,20 @@ internal static class SplitArgs
 				if (s == '"')
 					break;
 				else
-					sb.Append(s);
+					_ = sb.Append(s);
 			} while (s != END);
 			argv[j++] = sb.ToString();
-			sb.Clear();
+			_ = sb.Clear();
 		}
 		else
 		{
-			while (s != END && s != ' ' && s != '\t')
+			while (s is not END and not ' ' and not '\t')
 			{
-				sb.Append(s);
+				_ = sb.Append(s);
 				s = ++i < len ? cmdline[i] : END;
 			}
 			argv[j++] = sb.ToString();
-			sb.Clear();
+			_ = sb.Clear();
 		}
 		while (s is ' ' or '\t')
 			s = ++i < len ? cmdline[i] : END;
@@ -137,11 +135,12 @@ internal static class SplitArgs
 		{
 			if ((s == ' ' || s == '\t') && qcount == 0)
 			{
-				/* close the argument */
+				// close the argument
 				argv[j++] = sb.ToString();
-				sb.Clear();
+				_ = sb.Clear();
 				bcount = 0;
-				/* skip to the next one and initialize it if any */
+
+				// skip to the next one and initialize it if any
 				do
 				{
 					s = ++i < len ? cmdline[i] : END;
@@ -149,7 +148,7 @@ internal static class SplitArgs
 			}
 			else if (s == '\\')
 			{
-				sb.Append(s);
+				_ = sb.Append(s);
 				s = ++i < len ? cmdline[i] : END;
 				bcount++;
 			}
@@ -157,18 +156,19 @@ internal static class SplitArgs
 			{
 				if ((bcount & 1) == 0)
 				{
-					/* Preceded by an even number of '\', this is half that number of '\', plus a quote which we erase. */
+					// Preceded by an even number of '\', this is half that number of '\', plus a quote which we erase.
 					sb.Length -= bcount / 2;
 					qcount++;
 				}
 				else
 				{
-					/* Preceded by an odd number of '\', this is half that number of '\' followed by a '"' */
-					sb.Length = (sb.Length - 1) - bcount / 2 - 1;
-					sb.Append('"');
+					// Preceded by an odd number of '\', this is half that number of '\' followed by a '"'
+					sb.Length = sb.Length - 1 - (bcount / 2) - 1;
+					_ = sb.Append('"');
 				}
 				s = ++i < len ? cmdline[i] : END;
 				bcount = 0;
+
 				/* Now count the number of consecutive quotes. Note that qcount
 				 * already takes into account the opening quote if any, as well as
 				 * the quote that lead us here.
@@ -177,7 +177,7 @@ internal static class SplitArgs
 				{
 					if (++qcount == 3)
 					{
-						sb.Append('"');
+						_ = sb.Append('"');
 						qcount = 0;
 					}
 					s = ++i < len ? cmdline[i] : END;
@@ -187,8 +187,8 @@ internal static class SplitArgs
 			}
 			else
 			{
-				/* a regular character */
-				sb.Append(s);
+				// a regular character
+				_ = sb.Append(s);
 				s = ++i < len ? cmdline[i] : END;
 				bcount = 0;
 			}
@@ -196,7 +196,7 @@ internal static class SplitArgs
 		if (sb.Length > 0)
 		{
 			argv[j++] = sb.ToString();
-			sb.Clear();
+			_ = sb.Clear();
 		}
 		return argv;
 	}
