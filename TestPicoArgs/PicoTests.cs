@@ -77,8 +77,8 @@ public class PicoTests
 	[Fact(DisplayName = "Valid quoted values")]
 	public void QuotedValues()
 	{
-		var expected = new string[] { "item1", "item2", "item3" };
-		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3'");
+		var expected = new string[] { "item1", "item2", "item3", "item 4" };
+		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\"");
 
 		var files = pico.GetMultipleParams("--file");
 
