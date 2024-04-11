@@ -181,8 +181,8 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "Regex splitting")]
-	public void RegexSplitting()
+	[Fact(DisplayName = "Argument splitting")]
+	public void ArgumentSplitting()
 	{
 		var expected = new string[] { "once", "upon", "a", "time", "in Hollywood" };
 		var pico = SplitArgs.BuildFromSingleString("once upon a time \"in Hollywood\"");

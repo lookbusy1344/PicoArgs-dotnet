@@ -1,4 +1,4 @@
-﻿// #define WINDOWS_CALLS
+﻿// #define WIN32_CALLS
 
 using PicoArgs_dotnet;
 using System.Runtime.InteropServices;
@@ -6,8 +6,10 @@ using System.Text;
 
 namespace TestPicoArgs;
 
-// Borrowed from
+// Borrowed / inspired from
 // https://github.com/fuweichin/Commander.NET/blob/master/Commander.NET/Utils.cs
+
+// This class provides a generic way to split command line arguments, but can also use the Windows API to do so
 
 internal static class SplitArgs
 {
@@ -26,18 +28,19 @@ internal static class SplitArgs
 	/// </summary>
 	internal static IEnumerable<string> SplitArgumentsLine(string line) => CommandLineToArgvW2($"echo {line}").Skip(1);
 
-#if WINDOWS_CALLS
+#if WIN32_CALLS
 	/**
 	 * Windows native CommandLineToArgvW
 	 * Copied from https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp#answer-749653
 	 */
+#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 	[DllImport("shell32.dll", SetLastError = true)]
 	private static extern IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
+#pragma warning restore SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
-	public static string[] CommandLineToArgvW2(string commandLine)
+	private static string[] CommandLineToArgvW2(string commandLine)
 	{
-		int argc;
-		var argv = CommandLineToArgvW(commandLine, out argc);
+		var argv = CommandLineToArgvW(commandLine, out var argc);
 		if (argv == IntPtr.Zero)
 			throw new System.ComponentModel.Win32Exception();
 		try
@@ -46,7 +49,7 @@ internal static class SplitArgs
 			for (var i = 0; i < argc; i++)
 			{
 				var p = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
-				args[i] = Marshal.PtrToStringUni(p)!;
+				args[i] = Marshal.PtrToStringUni(p) ?? "";
 			}
 			return args;
 		}
@@ -55,7 +58,9 @@ internal static class SplitArgs
 			Marshal.FreeHGlobal(argv);
 		}
 	}
+
 #else
+
 	/**
 	 * C# equivalent of CommandLineToArgvW
 	 * Translated from https://source.winehq.org/git/wine.git/blob/HEAD:/dlls/shcore/main.c#l264
