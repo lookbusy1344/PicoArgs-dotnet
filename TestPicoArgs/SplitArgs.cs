@@ -11,7 +11,7 @@ namespace TestPicoArgs;
 
 // This class provides a generic way to split command line arguments, but can also use the Windows API to do so
 
-internal static partial class SplitArgs
+internal static class SplitArgs
 {
 	/// <summary>
 	/// Build a PicoArgs from a single command line arguments
@@ -26,8 +26,11 @@ internal static partial class SplitArgs
 	/// <summary>
 	/// Split a command line into arguments (adds "echo" to the front to handle the case where the first argument is quoted)
 	/// </summary>
-	internal static IEnumerable<string> SplitArgumentsLine(string line) => CommandLineToArgvW2($"echo {line}").Skip(1);
+	private static IEnumerable<string> SplitArgumentsLine(string line) => SplitArgsImplementation.CommandLineToArgvW($"echo {line}").Skip(1);
+}
 
+internal static partial class SplitArgsImplementation
+{
 #if WIN32_CALLS
 	/**
 	 * Windows native CommandLineToArgvW
@@ -36,7 +39,7 @@ internal static partial class SplitArgs
 	[LibraryImport("shell32.dll", SetLastError = true)]
 	private static partial IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
 
-	private static string[] CommandLineToArgvW2(string commandLine)
+	internal static string[] CommandLineToArgvW(string commandLine)
 	{
 		var argv = CommandLineToArgvW(commandLine, out var argc);
 		if (argv == IntPtr.Zero)
@@ -63,13 +66,13 @@ internal static partial class SplitArgs
 	 * C# equivalent of CommandLineToArgvW
 	 * Translated from https://source.winehq.org/git/wine.git/blob/HEAD:/dlls/shcore/main.c#l264
 	 */
-	private static string[] CommandLineToArgvW2(string cmdline)
+	internal static string[] CommandLineToArgvW(string cmdline)
 	{
 		if (string.IsNullOrWhiteSpace(cmdline)) return [];
 
 		var len = cmdline.Length;
 		var i = 0;
-		var s = cmdline[i];
+		var s = cmdline[0];
 		const char END = '\0';
 
 		// The first argument, the executable path, follows special rules
