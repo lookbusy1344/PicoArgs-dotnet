@@ -78,8 +78,7 @@ public class PicoTests
 	public void QuotedValues()
 	{
 		var expected = new string[] { "item1", "item2", "item3" };
-		//var pico = new PicoArgs("--file=item1 --file=\"item2\" --file='item3'"); ** this does not parse as a single string!
-		var pico = new PicoArgs(["--file=item1", "--file=\"item2\"", "--file='item3'"]);
+		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3'");
 
 		var files = pico.GetMultipleParams("--file");
 

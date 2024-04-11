@@ -89,6 +89,7 @@ internal static class SplitArgs
 			while (s is not END and not ' ' and not '\t')
 				s = ++i < len ? cmdline[i] : END;
 		}
+
 		// skip to the first argument, if any
 		while (s is ' ' or '\t')
 			s = ++i < len ? cmdline[i] : END;
