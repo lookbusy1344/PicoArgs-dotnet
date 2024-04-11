@@ -16,7 +16,7 @@ internal static class SplitArgs
 	 */
 	private static string[] CommandLineToArgvW(string cmdline)
 	{
-		if ((cmdline = cmdline.Trim()).Length == 0) return [];
+		if (string.IsNullOrWhiteSpace(cmdline)) return [];
 
 		var len = cmdline.Length;
 		var i = 0;
@@ -30,16 +30,13 @@ internal static class SplitArgs
 			do
 			{
 				s = ++i < len ? cmdline[i] : END;
-				if (s == '"')
-					break;
+				if (s == '"') break;
 			} while (s != END);
 		}
 		else
 		{
 			while (s is not END and not ' ' and not '\t')
-			{
 				s = ++i < len ? cmdline[i] : END;
-			}
 		}
 		// skip to the first argument, if any
 		while (s is ' ' or '\t')
@@ -74,10 +71,10 @@ internal static class SplitArgs
 			else if (s == '"')
 			{
 				// '"'
-				if ((bcount & 1) == 0)
-					qcount++; // unescaped '"'
+				if ((bcount & 1) == 0) qcount++; // unescaped '"'
 				s = ++i < len ? cmdline[i] : END;
 				bcount = 0;
+
 				// consecutive quotes, see comment in copying code below
 				while (s == '"')
 				{
@@ -112,6 +109,7 @@ internal static class SplitArgs
 				else
 					_ = sb.Append(s);
 			} while (s != END);
+
 			argv[j++] = sb.ToString();
 			_ = sb.Clear();
 		}
@@ -122,13 +120,14 @@ internal static class SplitArgs
 				_ = sb.Append(s);
 				s = ++i < len ? cmdline[i] : END;
 			}
+
 			argv[j++] = sb.ToString();
 			_ = sb.Clear();
 		}
 		while (s is ' ' or '\t')
 			s = ++i < len ? cmdline[i] : END;
-		if (i >= len)
-			return argv;
+		if (i >= len) return argv;
+
 		qcount = 0;
 		bcount = 0;
 		while (i < len)
@@ -182,8 +181,7 @@ internal static class SplitArgs
 					}
 					s = ++i < len ? cmdline[i] : END;
 				}
-				if (qcount == 2)
-					qcount = 0;
+				if (qcount == 2) qcount = 0;
 			}
 			else
 			{
