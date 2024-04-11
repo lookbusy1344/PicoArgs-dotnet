@@ -16,7 +16,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - NO support for default help generation, you need to do this manually
 - NO support for conversions, all arguments are strings (all flags are bools) unless you convert them yourself
 - Tiny API, about 120 lines of code
-- Written for .NET 8 but should work with earlier versions
+- Written for .NET 8/7 but should work with earlier versions
 
 Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```Finished()```.
 
@@ -36,13 +36,8 @@ pico.Finished(); // we are finished, check for extra unwanted arguments & throw 
 
 More examples can be found in the ```Program.cs``` file.
 
-For testing, you can also construct from a single string. This uses a regex so is excluded in RELEASE builds:
 
-```csharp
-var pico = new PicoArgs("-r -f file1.txt -f \"file 2.txt\" -e example-exclude");
-```
-
-There is also a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may or may not be to your taste:
+There is a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may or may not be to your taste:
 
 ```csharp
 using var pico = new PicoArgsDisposable(args);
@@ -56,5 +51,3 @@ bool raw = pico.Contains("-r", "--raw");
 [![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml)
 
 Tests are written using xUnit and can be run with `dotnet test`. There is also a Github Actions workflow which runs the tests on push and pull request.
-
-Tests need the main project to be built in `debug` mode.
