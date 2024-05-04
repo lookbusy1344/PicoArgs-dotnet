@@ -55,8 +55,7 @@ public class PicoTests
 		var pico = SplitArgs.BuildFromSingleString("-f file.txt");
 
 		// this should throw an exception
-		Helpers.AssertPicoThrows(() =>
-		{
+		Helpers.AssertPicoThrows(() => {
 			var files = pico.GetParam("--something");
 		}, "GetParam() should throw when param missing", 10);
 	}
@@ -122,8 +121,7 @@ public class PicoTests
 		Assert.False(pico.IsEmpty);
 
 		// this should throw an exception
-		Helpers.AssertPicoThrows(() =>
-		{
+		Helpers.AssertPicoThrows(() => {
 			pico.Finished();
 		}, "Finished() should throw when parameters are leftover", 60);
 	}
@@ -156,8 +154,7 @@ public class PicoTests
 		Assert.Equal("file.txt", file);
 
 		// this should throw an exception
-		Helpers.AssertPicoThrows(() =>
-		{
+		Helpers.AssertPicoThrows(() => {
 			_ = pico.GetCommand();
 		}, "GetCommand() should throw when no command present", 40);
 	}
@@ -211,8 +208,7 @@ public class PicoTests
 		var pico = SplitArgs.BuildDisposableFromSingleString("-f file.txt --something");
 		var something = pico.Contains("--something");
 
-		Helpers.AssertPicoThrows(() =>
-		{
+		Helpers.AssertPicoThrows(() => {
 			pico.Dispose();
 		}, "Dispose() should throw when parameters are leftover", 60);
 #pragma warning restore CA2000 // Dispose objects before losing scope
@@ -231,8 +227,7 @@ public class PicoTests
 		Assert.False(notpresent);
 
 		// this should throw an exception
-		Helpers.AssertPicoThrows(() =>
-		{
+		Helpers.AssertPicoThrows(() => {
 			var verbose = pico.Contains("-v", "--verbose");
 		}, "Contains() should throw when unwanted switch value is present", 80);
 	}
