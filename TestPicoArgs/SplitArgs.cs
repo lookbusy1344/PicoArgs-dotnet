@@ -42,20 +42,19 @@ internal static partial class SplitArgsImplementation
 	internal static string[] CommandLineToArgvW(string commandLine)
 	{
 		var argv = CommandLineToArgvW(commandLine, out var argc);
-		if (argv == IntPtr.Zero)
+		if (argv == IntPtr.Zero) {
 			throw new System.ComponentModel.Win32Exception();
-		try
-		{
+		}
+
+		try {
 			var args = new string[argc];
-			for (var i = 0; i < argc; i++)
-			{
+			for (var i = 0; i < argc; i++) {
 				var p = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
 				args[i] = Marshal.PtrToStringUni(p) ?? "";
 			}
 			return args;
 		}
-		finally
-		{
+		finally {
 			Marshal.FreeHGlobal(argv);
 		}
 	}
