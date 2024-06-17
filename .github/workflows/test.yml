@@ -2,10 +2,10 @@ name: PicoArgs compile and test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dotnet7" ]
 
   pull_request:
-    branches: [ "main" ]
+    branches: [ "dotnet7" ]
 
 jobs:
   build:
