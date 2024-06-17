@@ -3,7 +3,9 @@
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 1.1.2 - 12 Nov 2023
+	Legacy version for .NET 7 (check main branch for latest version)
+
+    Version 1.1.2 - 17 Jun 2024
 
     Example usage:
 
@@ -14,6 +16,7 @@
 	string requiredpath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
 	string[] files = pico.GetMultipleParams("-f", "--file");  // multiple parameters returned in string[]
 	string command = pico.GetCommand();  // first parameter, throws if not present
+	string commandopt = pico.GetCommandOpt();  // first parameter, null if not present
 
 	pico.Finished();  // We are done. Throw if there are any unused parameters
 
