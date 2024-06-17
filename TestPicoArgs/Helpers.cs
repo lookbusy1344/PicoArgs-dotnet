@@ -10,10 +10,11 @@ internal static partial class Helpers
 	public static void AssertThrows<E>(Action action, string errmsg) where E : Exception
 	{
 		var result = CheckThrows<E>(action);
-		if (!result)
+		if (!result) {
 			Assert.Fail(errmsg);
-		else
+		} else {
 			Assert.True(true);
+		}
 	}
 
 	/// <summary>
@@ -27,20 +28,22 @@ internal static partial class Helpers
 			action();
 		}
 		catch (PicoArgsException ex) {
-			if (code == null)
+			if (code == null) {
 				result = true;  // true if no code specified
-			else
+			} else {
 				result = ex.Code == code; // true if code matches
+			}
 		}
 		catch {
 			// some other exception was thrown, test failed
 			result = false;
 		}
 
-		if (!result)
+		if (!result) {
 			Assert.Fail(errmsg);
-		else
+		} else {
 			Assert.True(true);
+		}
 	}
 
 	/// <summary>
@@ -69,7 +72,7 @@ internal static partial class Helpers
 	/// </summary>
 	public static bool CompareNames(string[] a, string[] b)
 	{
-		if (a.Length != b.Length) return false;
+		if (a.Length != b.Length) { return false; }
 
 		return a.OrderBy(s => s)
 			.SequenceEqual(b.OrderBy(s => s));
