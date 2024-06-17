@@ -8,16 +8,14 @@ internal static class Program
 		Console.WriteLine("PicoArgs-dotnet.exe --raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
 		Console.WriteLine("PicoArgs-dotnet.exe --raw -f=file1.txt -f=\"file 2.txt\" --file file3.txt -f=\"-something=else\" --exclude=\"something else\"");
 
-		try
-		{
+		try {
 			//var pico = new PicoArgs("--raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
 			var pico = new PicoArgs(args);
 
 			var help = pico.Contains("-h", "-?", "--help");
 
 			// if we want help, just bail here
-			if (help)
-			{
+			if (help) {
 				Console.WriteLine(HelpMessage);
 				return;
 			}
@@ -31,8 +29,7 @@ internal static class Program
 			pico.Finished();
 
 			// show the results
-			if (files.Length == 0)
-			{
+			if (files.Length == 0) {
 				Console.WriteLine(HelpMessage);
 				Console.WriteLine("\r\nNo files specified");
 				return;
@@ -43,12 +40,10 @@ internal static class Program
 			Console.WriteLine($"files: {filesstr}");
 			Console.WriteLine($"exclude: {exclude}");
 		}
-		catch (PicoArgsException ex)
-		{
+		catch (PicoArgsException ex) {
 			Console.WriteLine($"PICOARGS ERROR: {ex.Message}");
 		}
-		catch (Exception ex)
-		{
+		catch (Exception ex) {
 			Console.WriteLine($"ERROR: {ex.Message}");
 		}
 	}
@@ -67,7 +62,9 @@ internal static class Program
 		var help = pico.Contains("-h", "-?", "--help");
 
 		// if we want help, just bail here, dont bother parsing the rest
-		if (help) return (true, null!, null!, false);
+		if (help) {
+			return (true, null!, null!, false);
+		}
 
 		// parse the rest of the command line
 		var folder = new DirectoryInfo(pico.GetParamOpt("-f", "--folder") ?? ".");

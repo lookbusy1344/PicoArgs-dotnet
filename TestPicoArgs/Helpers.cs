@@ -23,19 +23,16 @@ internal static partial class Helpers
 	{
 		var result = false; // assume test fails
 
-		try
-		{
+		try {
 			action();
 		}
-		catch (PicoArgsException ex)
-		{
+		catch (PicoArgsException ex) {
 			if (code == null)
 				result = true;  // true if no code specified
 			else
 				result = ex.Code == code; // true if code matches
 		}
-		catch
-		{
+		catch {
 			// some other exception was thrown, test failed
 			result = false;
 		}
@@ -51,17 +48,14 @@ internal static partial class Helpers
 	/// </summary>
 	public static bool CheckThrows<E>(Action action) where E : Exception
 	{
-		try
-		{
+		try {
 			action();
 		}
-		catch (E)
-		{
+		catch (E) {
 			// expected exception was thrown, test passed
 			return true;
 		}
-		catch
-		{
+		catch {
 			// some other exception was thrown, test failed
 			return false;
 		}
