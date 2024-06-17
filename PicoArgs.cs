@@ -52,19 +52,20 @@ public class PicoArgs
 	public bool Contains(params string[] options)
 	{
 		CheckFinished();
-		if (options == null || options.Length == 0)
+		if (options == null || options.Length == 0) {
 			throw new ArgumentException("Must specify at least one option", nameof(options));
+		}
 
 		// no args left
-		if (args.Count == 0) return false;
+		if (args.Count == 0) { return false; }
 
-		foreach (var o in options)
-		{
-			if (!o.StartsWith('-')) throw new ArgumentException("Must start with -", nameof(options));
+		foreach (var o in options) {
+			if (!o.StartsWith('-')) {
+				throw new ArgumentException("Must start with -", nameof(options));
+			}
 
 			var index = args.FindIndex(a => a.Key == o);
-			if (index >= 0)
-			{
+			if (index >= 0) {
 				// found switch so consume it and return
 				args.RemoveAt(index);
 				return true;
@@ -94,10 +95,9 @@ public class PicoArgs
 	{
 		CheckFinished();
 		var result = new List<string>();
-		while (true)
-		{
+		while (true) {
 			var s = GetParamOpt(options);
-			if (s == null) break;   // nothing else found, break out of loop
+			if (s == null) { break; }   // nothing else found, break out of loop
 			result.Add(s);
 		}
 
@@ -111,23 +111,26 @@ public class PicoArgs
 	public string? GetParamOpt(params string[] options)
 	{
 		CheckFinished();
-		if (options == null || options.Length == 0)
+		if (options == null || options.Length == 0) {
 			throw new ArgumentException("Must specify at least one option", nameof(options));
+		}
 
-		if (args.Count == 0) return null;
+		if (args.Count == 0) { return null; }
 
 		// check all options are switches
-		foreach (var o in options)
-			if (!o.StartsWith('-')) throw new ArgumentException("Must start with -", nameof(options));
+		foreach (var o in options) {
+			if (!o.StartsWith('-')) {
+				throw new ArgumentException("Must start with -", nameof(options));
+			}
+		}
 
 		// do we have this switch on command line?
 		var index = args.FindIndex(a => options.Contains(a.Key));
-		if (index == -1) return null;
+		if (index == -1) { return null; }
 
 		// check if this key has an identified value
 		var item = args[index];
-		if (item.Value != null)
-		{
+		if (item.Value != null) {
 			args.RemoveAt(index);
 			return item.Value;
 		}
@@ -135,13 +138,15 @@ public class PicoArgs
 		// otherwise, there is no identified value, so we need to look at the next parameter
 
 		// is it the last parameter?
-		if (index == args.Count - 1)
+		if (index == args.Count - 1) {
 			throw new PicoArgsException(20, $"Expected value after \"{item.Key}\"");
+		}
 
 		// grab and check the next parameter
 		var seconditem = args[index + 1];
-		if (seconditem.Value != null)
+		if (seconditem.Value != null) {
 			throw new PicoArgsException(30, $"Cannot identify value for param \"{item.Key}\", followed by \"{seconditem.Key}\" and \"{seconditem.Value}\"");
+		}
 
 		// consume the switch and the seperate value
 		args.RemoveRange(index, 2);
@@ -156,11 +161,15 @@ public class PicoArgs
 	public string GetCommand()
 	{
 		CheckFinished();
-		if (args.Count == 0) throw new PicoArgsException(40, "Expected command");
+		if (args.Count == 0) {
+			throw new PicoArgsException(40, "Expected command");
+		}
 
 		// check for a switch
 		var cmd = args[0].Key;
-		if (cmd.StartsWith('-')) throw new PicoArgsException(50, $"Expected command not \"{cmd}\"");
+		if (cmd.StartsWith('-')) {
+			throw new PicoArgsException(50, $"Expected command not \"{cmd}\"");
+		}
 
 		// consume the command, and return it
 		args.RemoveAt(0);
@@ -182,8 +191,9 @@ public class PicoArgs
 	/// </summary>
 	public void Finished()
 	{
-		if (args.Count > 0)
+		if (args.Count > 0) {
 			throw new PicoArgsException(60, $"Unrecognised parameter(s): {string.Join(", ", args)}");
+		}
 
 		finished = true;
 	}
@@ -193,8 +203,9 @@ public class PicoArgs
 	/// </summary>
 	private void CheckFinished()
 	{
-		if (finished)
+		if (finished) {
 			throw new PicoArgsException(70, "Cannot use PicoArgs after calling Finished()");
+		}
 	}
 }
 
@@ -222,8 +233,9 @@ public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 	/// </summary>
 	public void Dispose()
 	{
-		if (!SuppressCheck)
+		if (!SuppressCheck) {
 			Finished();
+		}
 	}
 }
 
@@ -237,21 +249,20 @@ public readonly record struct KeyValue(string Key, string? Value)
 		ArgumentNullException.ThrowIfNull(arg);
 
 		// if arg does not start with a dash, this cannot be a key+value eg --key=value vs key=value
-		if (!recogniseEquals || !arg.StartsWith('-')) return new KeyValue(arg, null);
+		if (!recogniseEquals || !arg.StartsWith('-')) { return new KeyValue(arg, null); }
 
 		// locate positions of quotes and equals
 		var singleQuote = IndexOf(arg, '\'') ?? int.MaxValue;
 		var doubleQuote = IndexOf(arg, '\"') ?? int.MaxValue;
 		var eq = IndexOf(arg, '=');
 
-		if (eq < singleQuote && eq < doubleQuote)
-		{
+		if (eq < singleQuote && eq < doubleQuote) {
 			// if the equals is before the quotes, then split on the equals
 			var parts = arg.Split(new char[] { '=' }, 2);
 			return new KeyValue(parts[0], TrimQuote(parts[1]));
-		}
-		else
+		} else {
 			return new KeyValue(arg, null);
+		}
 	}
 
 	/// <summary>
@@ -268,12 +279,16 @@ public readonly record struct KeyValue(string Key, string? Value)
 	/// </summary>
 	private static string TrimQuote(string str)
 	{
-		if (string.IsNullOrEmpty(str) || str.Length < 2) return str;
+		if (string.IsNullOrEmpty(str) || str.Length < 2) {
+			return str;
+		}
 
 		var c = str[0];
-		if (c is '\'' or '\"')
-			if (str[^1] == c)
+		if (c is '\'' or '\"') {
+			if (str[^1] == c) {
 				return str[1..^1];    // if ends with same quote, remove them
+			}
+		}
 
 		return str;   // just return original string
 	}
