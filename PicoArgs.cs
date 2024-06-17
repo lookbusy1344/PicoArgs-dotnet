@@ -1,8 +1,4 @@
-#if DEBUG
-using System.Text.RegularExpressions;
-#endif
-
-namespace PicoArgs_dotnet;
+﻿namespace PicoArgs_dotnet;
 
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
@@ -39,13 +35,6 @@ public class PicoArgs
 	/// </summary>
 	public PicoArgs(IEnumerable<string> args, bool recogniseEquals = true) => this.args = args.Select(a => KeyValue.Build(a, recogniseEquals)).ToList();
 
-#if DEBUG
-	/// <summary>
-	/// Build a PicoArgs from a single string, for testing
-	/// </summary>
-	public PicoArgs(string args, bool recogniseEquals = true) : this(StringSplitter.SplitParams(args), recogniseEquals) { }
-#endif
-
 	/// <summary>
 	/// Get a boolean value from the command line, returns TRUE if found
 	/// </summary>
@@ -57,7 +46,9 @@ public class PicoArgs
 		}
 
 		// no args left
-		if (args.Count == 0) { return false; }
+		if (args.Count == 0) {
+			return false;
+		}
 
 		foreach (var o in options) {
 			if (!o.StartsWith('-')) {
@@ -66,6 +57,11 @@ public class PicoArgs
 
 			var index = args.FindIndex(a => a.Key == o);
 			if (index >= 0) {
+				// if this argument has a value, throw eg "--verbose=true" when we just expected "--verbose"
+				if (args[index].Value != null) {
+					throw new PicoArgsException(80, $"Unexpected value for \"{string.Join(", ", options)}\"");
+				}
+
 				// found switch so consume it and return
 				args.RemoveAt(index);
 				return true;
@@ -158,11 +154,16 @@ public class PicoArgs
 	/// <summary>
 	/// Return and consume the first command line parameter. Throws if not present
 	/// </summary>
-	public string GetCommand()
+	public string GetCommand() => GetCommandOpt() ?? throw new PicoArgsException(40, "Expected command");
+
+	/// <summary>
+	/// Return and consume the first command line parameter. Returns null if not present
+	/// </summary>
+	public string? GetCommandOpt()
 	{
 		CheckFinished();
 		if (args.Count == 0) {
-			throw new PicoArgsException(40, "Expected command");
+			return null;
 		}
 
 		// check for a switch
@@ -214,14 +215,7 @@ public class PicoArgs
 /// </summary>
 public sealed class PicoArgsDisposable : PicoArgs, IDisposable
 {
-	public PicoArgsDisposable(string[] args) : base(args) { }
-
-#if DEBUG
-	/// <summary>
-	/// Build a PicoArgs from a single string, for testing
-	/// </summary>
-	public PicoArgsDisposable(string args) : base(args) { }
-#endif
+	public PicoArgsDisposable(IEnumerable<string> args) : base(args) { }
 
 	/// <summary>
 	/// If true, supress the check for unused command line parameters
@@ -315,23 +309,3 @@ public class PicoArgsException : Exception
 	{
 	}
 }
-
-#if DEBUG
-/// <summary>
-/// Helper class to split a string into parameters, respecting quotes
-/// </summary>
-internal static partial class StringSplitter
-{
-	/// <summary>
-	/// Split a string into parameters, respecting quotes
-	/// </summary>
-	/// <returns></returns>
-	public static List<string> SplitParams(string s) => SplitOnSpacesRespectQuotes().Split(s).Where(i => i != "\"").ToList();
-
-	/// <summary>
-	/// Regex to split a string into parameters, respecting quotes
-	/// </summary>
-	[GeneratedRegex("(?<=\")(.*?)(?=\")|\\s+")]
-	private static partial Regex SplitOnSpacesRespectQuotes();
-}
-#endif
