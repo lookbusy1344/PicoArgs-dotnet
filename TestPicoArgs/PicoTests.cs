@@ -132,23 +132,23 @@ public class PicoTests
 		}, "GetCommand() should throw when no command present", 40);
 	}
 
-	//[Fact(DisplayName = "GetCommandOpt test")]
-	//public void GetCommandOpt()
-	//{
-	//	var pico = SplitArgs.BuildFromSingleString("--file file.txt -v PRINT");
+	[Fact(DisplayName = "GetCommandOpt test")]
+	public void GetCommandOpt()
+	{
+		var pico = SplitArgs.BuildFromSingleString("--file file.txt -v PRINT");
 
-	//	var verbose = pico.Contains("-v", "--verbose");
-	//	var file = pico.GetParam("-f", "--file");
-	//	var print = pico.GetCommand();
-	//	var notfound = pico.GetCommandOpt();    // a command that is not present, so should be null
-	//	pico.Finished();
+		var verbose = pico.Contains("-v", "--verbose");
+		var file = pico.GetParam("-f", "--file");
+		var print = pico.GetCommand();
+		var notfound = pico.GetCommandOpt();    // a command that is not present, so should be null
+		pico.Finished();
 
-	//	Assert.True(verbose);
-	//	Assert.Equal("file.txt", file);
-	//	Assert.Equal("PRINT", print);
-	//	Assert.Null(notfound);
-	//	Assert.True(pico.IsEmpty);
-	//}
+		Assert.True(verbose);
+		Assert.Equal("file.txt", file);
+		Assert.Equal("PRINT", print);
+		Assert.Null(notfound);
+		Assert.True(pico.IsEmpty);
+	}
 
 	[Fact(DisplayName = "Argument splitting")]
 	public void ArgumentSplitting()

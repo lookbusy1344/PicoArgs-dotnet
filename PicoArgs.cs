@@ -46,7 +46,9 @@ public class PicoArgs
 		}
 
 		// no args left
-		if (args.Count == 0) { return false; }
+		if (args.Count == 0) {
+			return false;
+		}
 
 		foreach (var o in options) {
 			if (!o.StartsWith('-')) {
@@ -55,6 +57,11 @@ public class PicoArgs
 
 			var index = args.FindIndex(a => a.Key == o);
 			if (index >= 0) {
+				// if this argument has a value, throw eg "--verbose=true" when we just expected "--verbose"
+				if (args[index].Value != null) {
+					throw new PicoArgsException(80, $"Unexpected value for \"{string.Join(", ", options)}\"");
+				}
+
 				// found switch so consume it and return
 				args.RemoveAt(index);
 				return true;
@@ -147,11 +154,16 @@ public class PicoArgs
 	/// <summary>
 	/// Return and consume the first command line parameter. Throws if not present
 	/// </summary>
-	public string GetCommand()
+	public string GetCommand() => GetCommandOpt() ?? throw new PicoArgsException(40, "Expected command");
+
+	/// <summary>
+	/// Return and consume the first command line parameter. Returns null if not present
+	/// </summary>
+	public string? GetCommandOpt()
 	{
 		CheckFinished();
 		if (args.Count == 0) {
-			throw new PicoArgsException(40, "Expected command");
+			return null;
 		}
 
 		// check for a switch
