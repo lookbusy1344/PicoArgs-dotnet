@@ -1,11 +1,11 @@
-﻿namespace PicoArgs_dotnet;
+namespace PicoArgs_dotnet;
 
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
 	Legacy version for .NET 7 (check main branch for latest version)
 
-    Version 1.1.2 - 17 Jun 2024
+    Based on v1.3.1 - 21 Jun 2024 (da88251b07207d1cf61f27ffd58f719228a43206)
 
     Example usage:
 
@@ -76,17 +76,6 @@ public class PicoArgs
 	}
 
 	/// <summary>
-	/// Get a string value from the command line, throws is not present
-	/// eg -a "value" or --foldera "value"
-	/// </summary>
-	public string GetParam(params string[] options)
-	{
-		CheckFinished();
-		var s = GetParamOpt(options);
-		return s ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
-	}
-
-	/// <summary>
 	/// Get multiple parameters from the command line, or empty array if not present
 	/// eg -a value1 -a value2 will return ["value1", "value2"]
 	/// </summary>
@@ -96,12 +85,21 @@ public class PicoArgs
 		var result = new List<string>();
 		while (true) {
 			var s = GetParamOpt(options);
-			if (s == null) { break; }   // nothing else found, break out of loop
+			if (s == null) {
+				break;   // nothing else found, break out of loop
+			}
+
 			result.Add(s);
 		}
 
 		return result.ToArray();
 	}
+
+	/// <summary>
+	/// Get a string value from the command line, throws is not present
+	/// eg -a "value" or --foldera "value"
+	/// </summary>
+	public string GetParam(params string[] options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
 
 	/// <summary>
 	/// Get a string value from the command line, or null if not present
@@ -114,7 +112,9 @@ public class PicoArgs
 			throw new ArgumentException("Must specify at least one option", nameof(options));
 		}
 
-		if (args.Count == 0) { return null; }
+		if (args.Count == 0) {
+			return null;
+		}
 
 		// check all options are switches
 		foreach (var o in options) {
@@ -125,7 +125,9 @@ public class PicoArgs
 
 		// do we have this switch on command line?
 		var index = args.FindIndex(a => options.Contains(a.Key));
-		if (index == -1) { return null; }
+		if (index == -1) {
+			return null;
+		}
 
 		// check if this key has an identified value
 		var item = args[index];
@@ -246,7 +248,9 @@ public readonly record struct KeyValue(string Key, string? Value)
 		ArgumentNullException.ThrowIfNull(arg);
 
 		// if arg does not start with a dash, this cannot be a key+value eg --key=value vs key=value
-		if (!recogniseEquals || !arg.StartsWith('-')) { return new KeyValue(arg, null); }
+		if (!recogniseEquals || !arg.StartsWith('-')) {
+			return new KeyValue(arg, null);
+		}
 
 		// locate positions of quotes and equals
 		var singleQuote = IndexOf(arg, '\'') ?? int.MaxValue;
@@ -255,7 +259,7 @@ public readonly record struct KeyValue(string Key, string? Value)
 
 		if (eq < singleQuote && eq < doubleQuote) {
 			// if the equals is before the quotes, then split on the equals
-			var parts = arg.Split(new char[] { '=' }, 2);
+			var parts = arg.Split('=', 2);
 			return new KeyValue(parts[0], TrimQuote(parts[1]));
 		} else {
 			return new KeyValue(arg, null);
@@ -265,30 +269,13 @@ public readonly record struct KeyValue(string Key, string? Value)
 	/// <summary>
 	/// Index of a char in a string, or null if not found
 	/// </summary>
-	private static int? IndexOf(string str, char chr)
-	{
-		var pos = str.IndexOf(chr);
-		return pos < 0 ? null : pos;
-	}
+	private static int? IndexOf(string str, char chr) => str.IndexOf(chr) is int pos && pos >= 0 ? pos : null;
 
 	/// <summary>
 	/// If the string starts and ends with the same quote, remove them eg "hello world" -> hello world
 	/// </summary>
-	private static string TrimQuote(string str)
-	{
-		if (string.IsNullOrEmpty(str) || str.Length < 2) {
-			return str;
-		}
-
-		var c = str[0];
-		if (c is '\'' or '\"') {
-			if (str[^1] == c) {
-				return str[1..^1];    // if ends with same quote, remove them
-			}
-		}
-
-		return str;   // just return original string
-	}
+	private static string TrimQuote(string str) =>
+		(str.Length > 1 && (str[0] is '\'' or '\"') && str[^1] == str[0]) ? str[1..^1] : str;
 }
 
 /// <summary>
@@ -300,15 +287,9 @@ public class PicoArgsException : Exception
 
 	public PicoArgsException(int code, string message) : base(message) => this.Code = code;
 
-	public PicoArgsException()
-	{
-	}
+	public PicoArgsException() { }
 
-	public PicoArgsException(string message) : base(message)
-	{
-	}
+	public PicoArgsException(string message) : base(message) { }
 
-	public PicoArgsException(string message, Exception innerException) : base(message, innerException)
-	{
-	}
+	public PicoArgsException(string message, Exception innerException) : base(message, innerException) { }
 }
