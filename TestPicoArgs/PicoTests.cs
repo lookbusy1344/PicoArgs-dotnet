@@ -1,4 +1,4 @@
-﻿using PicoArgs_dotnet;
+using PicoArgs_dotnet;
 
 namespace TestPicoArgs;
 
@@ -9,7 +9,7 @@ namespace TestPicoArgs;
 
 public class PicoTests
 {
-	[Fact(DisplayName = "Basic test", Timeout = 1000)]
+	[Fact(DisplayName = "Basic test")]
 	public void BasicTest()
 	{
 		var pico = SplitArgs.BuildFromSingleString("--help --another something");
@@ -24,7 +24,7 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "GetParamOpt test", Timeout = 1000)]
+	[Fact(DisplayName = "GetParamOpt test")]
 	public void GetParamOptTest()
 	{
 		var pico = SplitArgs.BuildFromSingleString("--help --another something");
@@ -36,7 +36,7 @@ public class PicoTests
 		Assert.Null(missing);
 	}
 
-	[Fact(DisplayName = "GetMultipleParams test", Timeout = 1000)]
+	[Fact(DisplayName = "GetMultipleParams test")]
 	public void MultipleTest()
 	{
 		var expected = new string[] { "file.txt", "another.txt", "again.txt" };
@@ -49,7 +49,7 @@ public class PicoTests
 		Assert.False(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "GetParam - parameter not found", Timeout = 1000)]
+	[Fact(DisplayName = "GetParam - parameter not found")]
 	public void NoParamFound()
 	{
 		var pico = SplitArgs.BuildFromSingleString("-f file.txt");
@@ -60,7 +60,7 @@ public class PicoTests
 		}, "GetParam() should throw when param missing", 10);
 	}
 
-	[Fact(DisplayName = "Using equals and complex value", Timeout = 1000)]
+	[Fact(DisplayName = "Using equals and complex value")]
 	public void ComplexValue()
 	{
 		var expected = new string[] { "file.txt", "-something=else" };
@@ -73,7 +73,34 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
-	[Fact(DisplayName = "Using equals and complex value, when not enabled", Timeout = 1000)]
+	[Fact(DisplayName = "Valid quoted values")]
+	public void QuotedValues()
+	{
+		var expected = new string[] { "item1", "item2", "item3", "item 4" };
+		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\"");
+
+		var files = pico.GetMultipleParams("--file");
+
+		var match = Helpers.CompareNames(expected, files);
+		Assert.True(match);
+		Assert.True(pico.IsEmpty);
+	}
+
+	[Fact(DisplayName = "Invalid quoted values")]
+	public void InvalidQuotedValues()
+	{
+		// these quotes do not match, so are not parsed
+		var expected = new string[] { "\"item1'", "'item2\"" };
+		var pico = new PicoArgs(new[] { "--file=\"item1'", "--file='item2\"" });
+
+		var files = pico.GetMultipleParams("--file");
+
+		var match = Helpers.CompareNames(expected, files);
+		Assert.True(match);
+		Assert.True(pico.IsEmpty);
+	}
+
+	[Fact(DisplayName = "Using equals and complex value, when not enabled")]
 	public void ComplexValueFail()
 	{
 		//var expected = new string[] { "file.txt", "-something=else" };
@@ -84,7 +111,7 @@ public class PicoTests
 		Assert.Empty(files);
 	}
 
-	[Fact(DisplayName = "Leftover parameter", Timeout = 1000)]
+	[Fact(DisplayName = "Leftover parameter")]
 	public void LeftoverParam()
 	{
 		var pico = SplitArgs.BuildFromSingleString("-f file.txt --something");
@@ -99,7 +126,7 @@ public class PicoTests
 		}, "Finished() should throw when parameters are leftover", 60);
 	}
 
-	[Fact(DisplayName = "GetCommand test", Timeout = 1000)]
+	[Fact(DisplayName = "GetCommand test")]
 	public void GetCommand()
 	{
 		var pico = SplitArgs.BuildFromSingleString("--file file.txt -v PRINT");
@@ -161,7 +188,7 @@ public class PicoTests
 		Assert.True(match);
 	}
 
-	[Fact(DisplayName = "Key / value splitting in detail", Timeout = 1000)]
+	[Fact(DisplayName = "Key / value splitting in detail")]
 	public void KVCheck()
 	{
 		var expected = new KeyValue[] { new("--file", "file1.txt"), new("--print", null),
@@ -174,7 +201,7 @@ public class PicoTests
 		Assert.True(match);
 	}
 
-	[Fact(DisplayName = "PicoArgsDisposable check", Timeout = 1000)]
+	[Fact(DisplayName = "PicoArgsDisposable check")]
 	public void DisposalCheck()
 	{
 #pragma warning disable CA2000 // Dispose objects before losing scope

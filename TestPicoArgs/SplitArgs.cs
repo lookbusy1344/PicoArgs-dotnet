@@ -26,35 +26,35 @@ internal static class SplitArgs
 	/// <summary>
 	/// Split a command line into arguments (adds "echo" to the front to handle the case where the first argument is quoted)
 	/// </summary>
-	internal static IEnumerable<string> SplitArgumentsLine(string line) => CommandLineToArgvW2($"echo {line}").Skip(1);
+	private static IEnumerable<string> SplitArgumentsLine(string line) => SplitArgsImplementation.CommandLineToArgvW($"echo {line}").Skip(1);
+}
 
+internal static partial class SplitArgsImplementation
+{
 #if WIN32_CALLS
 	/**
 	 * Windows native CommandLineToArgvW
 	 * Copied from https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp#answer-749653
 	 */
-#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
-	[DllImport("shell32.dll", SetLastError = true)]
-	private static extern IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
-#pragma warning restore SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
+	[LibraryImport("shell32.dll", SetLastError = true)]
+	private static partial IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
 
-	private static string[] CommandLineToArgvW2(string commandLine)
+	internal static string[] CommandLineToArgvW(string commandLine)
 	{
 		var argv = CommandLineToArgvW(commandLine, out var argc);
-		if (argv == IntPtr.Zero)
+		if (argv == IntPtr.Zero) {
 			throw new System.ComponentModel.Win32Exception();
-		try
-		{
+		}
+
+		try {
 			var args = new string[argc];
-			for (var i = 0; i < argc; i++)
-			{
+			for (var i = 0; i < argc; i++) {
 				var p = Marshal.ReadIntPtr(argv, i * IntPtr.Size);
 				args[i] = Marshal.PtrToStringUni(p) ?? "";
 			}
 			return args;
 		}
-		finally
-		{
+		finally {
 			Marshal.FreeHGlobal(argv);
 		}
 	}
@@ -65,7 +65,7 @@ internal static class SplitArgs
 	 * C# equivalent of CommandLineToArgvW
 	 * Translated from https://source.winehq.org/git/wine.git/blob/HEAD:/dlls/shcore/main.c#l264
 	 */
-	private static string[] CommandLineToArgvW2(string cmdline)
+	internal static string[] CommandLineToArgvW(string cmdline)
 	{
 		if (string.IsNullOrWhiteSpace(cmdline)) {
 			return Array.Empty<string>();
@@ -73,7 +73,7 @@ internal static class SplitArgs
 
 		var len = cmdline.Length;
 		var i = 0;
-		var s = cmdline[i];
+		var s = cmdline[0];
 		const char END = '\0';
 
 		// The first argument, the executable path, follows special rules
@@ -81,19 +81,24 @@ internal static class SplitArgs
 		if (s == '"') {
 			do {
 				s = ++i < len ? cmdline[i] : END;
-				if (s == '"') { break; }
+				if (s == '"') {
+					break;
+				}
 			} while (s != END);
 		} else {
 			while (s is not END and not ' ' and not '\t') {
 				s = ++i < len ? cmdline[i] : END;
 			}
 		}
+
 		// skip to the first argument, if any
 		while (s is ' ' or '\t') {
 			s = ++i < len ? cmdline[i] : END;
 		}
 
-		if (s != END) { argc++; }
+		if (s != END) {
+			argc++;
+		}
 
 		// Analyze the remaining arguments
 		var qcount = 0; // quote count
@@ -106,7 +111,10 @@ internal static class SplitArgs
 					s = ++i < len ? cmdline[i] : END;
 				} while (s is ' ' or '\t');
 
-				if (s != END) { argc++; }
+				if (s != END) {
+					argc++;
+				}
+
 				bcount = 0;
 			} else if (s == '\\') {
 				// '\', count them
@@ -116,7 +124,10 @@ internal static class SplitArgs
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 			} else if (s == '"') {
 				// '"'
-				if ((bcount & 1) == 0) { qcount++; } // unescaped '"'
+				if ((bcount & 1) == 0) {
+					qcount++; // unescaped '"'
+				}
+
 				s = ++i < len ? cmdline[i] : END;
 				bcount = 0;
 
@@ -126,7 +137,9 @@ internal static class SplitArgs
 					s = ++i < len ? cmdline[i] : END;
 				}
 				qcount %= 3;
-				if (qcount == 2) { qcount = 0; }
+				if (qcount == 2) {
+					qcount = 0;
+				}
 			} else {
 				// a regular character
 				bcount = 0;
@@ -166,7 +179,9 @@ internal static class SplitArgs
 			s = ++i < len ? cmdline[i] : END;
 		}
 
-		if (i >= len) { return argv; }
+		if (i >= len) {
+			return argv;
+		}
 
 		qcount = 0;
 		bcount = 0;
@@ -209,7 +224,9 @@ internal static class SplitArgs
 					}
 					s = ++i < len ? cmdline[i] : END;
 				}
-				if (qcount == 2) { qcount = 0; }
+				if (qcount == 2) {
+					qcount = 0;
+				}
 			} else {
 				// a regular character
 				_ = sb.Append(s);
