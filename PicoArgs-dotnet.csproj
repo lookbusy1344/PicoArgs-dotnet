@@ -1,15 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-<Target Name="SetSourceRevisionId" BeforeTargets="InitializeSourceControlInformation">
-    <Exec Command="git describe --long --always --dirty=+ --broken --exclude=* --abbrev=40" ConsoleToMSBuild="True" IgnoreExitCode="False">
-      <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput" />
-    </Exec>
-</Target>
-
   <PropertyGroup>
-    <Version>1.1.5.0</Version> 
-	<InformationalVersion>$(SourceRevisionId)</InformationalVersion> 
-
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>PicoArgs_dotnet</RootNamespace>
