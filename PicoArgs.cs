@@ -194,7 +194,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	public void Finished()
 	{
 		if (args.Count > 0) {
-			throw new PicoArgsException(60, $"Unrecognised parameter(s): {string.Join(", ", args)}");
+			throw new PicoArgsException(60, $"Unrecognised parameter(s): {string.Join(", ", args.Select(a => a.Key))}");
 		}
 
 		finished = true;
