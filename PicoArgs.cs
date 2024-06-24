@@ -1,13 +1,13 @@
-namespace PicoArgs_dotnet;
+﻿namespace PicoArgs_dotnet;
 
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
+	Version 1.4.0 - 24 Jun 2024
+
 	Legacy version for .NET 7 (check main branch for latest version)
 
-    Based on v1.3.1 - 21 Jun 2024 (da88251b07207d1cf61f27ffd58f719228a43206)
-
-    Example usage:
+	Example usage:
 
 	var pico = new PicoArgs(args);
 
@@ -276,6 +276,8 @@ public readonly record struct KeyValue(string Key, string? Value)
 	/// </summary>
 	private static string TrimQuote(string str) =>
 		(str.Length > 1 && (str[0] is '\'' or '\"') && str[^1] == str[0]) ? str[1..^1] : str;
+
+	public override string ToString() => Value == null ? Key : $"{Key}={Value}";
 }
 
 /// <summary>
