@@ -149,7 +149,7 @@ public class PicoArgs
 			throw new PicoArgsException(30, $"Cannot identify value for param \"{item.Key}\", followed by \"{seconditem.Key}\" and \"{seconditem.Value}\"");
 		}
 
-		// consume the switch and the seperate value
+		// consume the switch and the separate value
 		args.RemoveRange(index, 2);
 
 		// return the value
