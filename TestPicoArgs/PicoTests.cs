@@ -285,9 +285,6 @@ public class PicoTests
 	{
 		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc=codename", true);
 
-		// confirm that "-abc codename" has been expanded to "-a -b -c codename"
-		//Assert.Equal(3 + 2 + 1, pico.UnconsumedArgs.Count);
-
 		var file = pico.GetParam("-f", "--file");
 		var code = pico.GetParam("-c", "--code");
 
@@ -302,5 +299,18 @@ public class PicoTests
 		Assert.True(a);
 		Assert.True(b);
 		Assert.False(x);
+	}
+
+	[Fact(DisplayName = "Multi switch with quotes")]
+	public void MultiSwitchWithQuotes()
+	{
+		// we do not support multi-switches with quotes eg:
+		// -abc='codename' is an error
+		// =abc=codename is fine and becomes -a -b -c codename
+
+		// this should throw an exception
+		Helpers.AssertPicoThrows(() => {
+			var pico = SplitArgs.BuildFromSingleString("--file=hello -abc='codename'", true);
+		}, "Multi-switches do not support quotes, and should throw", 90);
 	}
 }

@@ -211,20 +211,26 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Helper function to process the command line arguments
+	/// Helper function to process the command line arguments. Splits multiple switches into individual switches
+	/// eg -abc becomes -a -b -c
 	/// </summary>
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
-		// this needs updating to cope with -ac=something
 		foreach (var arg in args) {
 			if (MultipleSwitches(arg, recogniseEquals)) {
 				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
 
 				if (arg.Contains('=') && recogniseEquals) {
 					// multiple switches, with equals eg "-abc=code"
+
+					if (arg.Contains('\'') || arg.Contains('\"')) {
+						// contains quotes, which is not supported here
+						throw new PicoArgsException(90, $"Cannot handle multi-switch containing quotes \"{arg}\"");
+					}
+
 					var split = arg.Split(['='], 2);
 					if (split.Length != 2) {
-						throw new PicoArgsException(90, $"Cannot split \"{arg}\" on equals");
+						throw new PicoArgsException(90, $"Cannot split \"{arg}\" into two on '='");
 					}
 
 					// append the switches before the equals eg "-abc"
