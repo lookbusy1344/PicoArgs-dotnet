@@ -279,4 +279,28 @@ public class PicoTests
 		Assert.True(b);
 		Assert.False(x);
 	}
+
+	[Fact(DisplayName = "Multiple combined switches and param with equals")]
+	public void MultiSwitchAndParamEquals()
+	{
+		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc=codename", true);
+
+		// confirm that "-abc codename" has been expanded to "-a -b -c codename"
+		//Assert.Equal(3 + 2 + 1, pico.UnconsumedArgs.Count);
+
+		var file = pico.GetParam("-f", "--file");
+		var code = pico.GetParam("-c", "--code");
+
+		var a = pico.Contains("-a");
+		var b = pico.Contains("-b");
+		var x = pico.Contains("-x");        // not specified
+
+		pico.Finished();
+
+		Assert.Equal("hello", file);
+		Assert.Equal("codename", code);
+		Assert.True(a);
+		Assert.True(b);
+		Assert.False(x);
+	}
 }
