@@ -219,6 +219,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		foreach (var arg in args) {
 			if (MultipleSwitches(arg)) {
 				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
+
+				if (arg.Contains('=')) {
+					throw new PicoArgsException(90, $"Unexpected equals in \"{arg}\"");
+				}
+
 				foreach (var c in arg[1..]) {
 					yield return KeyValue.Build($"-{c}", recogniseEquals);
 				}
@@ -232,7 +237,18 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Check if this is multiple switches eg -abc
 	/// </summary>
-	private static bool MultipleSwitches(string arg) => arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
+	private static bool MultipleSwitches(string arg)
+	{
+		var equals = arg.IndexOf('=');
+		if (equals == -1) {
+			// no equals
+			return arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
+		}
+
+		// contains equals
+		arg = arg[..equals];
+		return arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
+	}
 }
 
 /// <summary>
