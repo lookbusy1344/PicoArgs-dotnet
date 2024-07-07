@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 1.4.0 - 05 Jul 2024
+    Version 1.4.99 - 07 Jul 2024
 
     Example usage:
 
@@ -215,8 +215,24 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
-		return args.Select(a => KeyValue.Build(a, recogniseEquals));
+		// this needs updating to cope with -ac=something
+		foreach (var arg in args) {
+			if (MultipleSwitches(arg)) {
+				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
+				foreach (var c in arg[1..]) {
+					yield return KeyValue.Build($"-{c}", recogniseEquals);
+				}
+			} else {
+				// just a single item eg "-a" or "--key=value" or "action"
+				yield return KeyValue.Build(arg, recogniseEquals);
+			}
+		}
 	}
+
+	/// <summary>
+	/// Check if this is multiple switches eg -abc
+	/// </summary>
+	private static bool MultipleSwitches(string arg) => arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
 }
 
 /// <summary>

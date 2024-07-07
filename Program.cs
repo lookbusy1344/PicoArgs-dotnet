@@ -22,7 +22,10 @@ internal static class Program
 
 			// parse the rest of the command line
 			var raw = pico.Contains("-r", "--raw");
-			var files = pico.GetMultipleParams("-f", "--file");
+			var fast = pico.Contains("-f", "--fast");
+			var slow = pico.Contains("-s", "--slow");
+
+			var files = pico.GetMultipleParams("-i", "--file");
 			var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
 
 			// we have finished, make sure there are no unused arguments
@@ -37,6 +40,8 @@ internal static class Program
 
 			var filesstr = string.Join(", ", files);
 			Console.WriteLine($"raw: {raw}");
+			Console.WriteLine($"fast: {fast}");
+			Console.WriteLine($"slow: {slow}");
 			Console.WriteLine($"files: {filesstr}");
 			Console.WriteLine($"exclude: {exclude}");
 		}
