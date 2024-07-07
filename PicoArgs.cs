@@ -217,15 +217,28 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	{
 		// this needs updating to cope with -ac=something
 		foreach (var arg in args) {
-			if (MultipleSwitches(arg)) {
+			if (MultipleSwitches(arg, recogniseEquals)) {
 				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
 
-				if (arg.Contains('=')) {
-					throw new PicoArgsException(90, $"Unexpected equals in \"{arg}\"");
-				}
+				if (arg.Contains('=') && recogniseEquals) {
+					// multiple switches, with equals eg "-abc=code"
+					var split = arg.Split(['='], 2);
+					if (split.Length != 2) {
+						throw new PicoArgsException(90, $"Cannot split \"{arg}\" on equals");
+					}
 
-				foreach (var c in arg[1..]) {
-					yield return KeyValue.Build($"-{c}", recogniseEquals);
+					// append the switches before the equals eg "-abc"
+					foreach (var c in split[0][1..]) {
+						yield return KeyValue.Build($"-{c}", false);
+					}
+
+					// finally yield the appended value, after the equals eg "code"
+					yield return KeyValue.Build(split[1], false);
+				} else {
+					// multiple switches, no equals eg "-abc"
+					foreach (var c in arg[1..]) {
+						yield return KeyValue.Build($"-{c}", false);
+					}
 				}
 			} else {
 				// just a single item eg "-a" or "--key=value" or "action"
@@ -237,11 +250,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Check if this is multiple switches eg -abc
 	/// </summary>
-	private static bool MultipleSwitches(string arg)
+	private static bool MultipleSwitches(string arg, bool recogniseEquals)
 	{
-		var equals = arg.IndexOf('=');
+		var equals = recogniseEquals ? arg.IndexOf('=') : -1;
 		if (equals == -1) {
-			// no equals
+			// no equals or ignore it
 			return arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
 		}
 
