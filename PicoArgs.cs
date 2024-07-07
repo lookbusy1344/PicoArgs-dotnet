@@ -220,8 +220,13 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			if (MultipleSwitches(arg)) {
 				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
 
-				if (arg.Contains('=') && recogniseEquals) {
+				if (arg.Contains('=')) {
 					// multiple switches, with equals eg "-abc=code"
+
+					if (!recogniseEquals) {
+						// contains equals but we arent recognising them
+						throw new PicoArgsException(90, $"Unexpected '=' in multi-switch \"{arg}\"");
+					}
 
 					if (arg.Contains('\'') || arg.Contains('\"')) {
 						// contains quotes, which is not supported here
