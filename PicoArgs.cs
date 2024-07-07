@@ -217,7 +217,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
 		foreach (var arg in args) {
-			if (MultipleSwitches(arg, recogniseEquals)) {
+			if (MultipleSwitches(arg)) {
 				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
 
 				if (arg.Contains('=') && recogniseEquals) {
@@ -241,7 +241,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 					// finally yield the appended value, after the equals eg "code"
 					yield return KeyValue.Build(split[1], false);
 				} else {
-					// multiple switches, no equals eg "-abc"
+					// multiple switches, no equals or ignore equals eg "-abc"
 					foreach (var c in arg[1..]) {
 						yield return KeyValue.Build($"-{c}", false);
 					}
@@ -254,18 +254,16 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Check if this is multiple switches eg -abc
+	/// Check if this is multiple switches eg -abc. This always respects '=' because its handled elsewhere
 	/// </summary>
-	private static bool MultipleSwitches(string arg, bool recogniseEquals)
+	private static bool MultipleSwitches(string arg)
 	{
-		var equals = recogniseEquals ? arg.IndexOf('=') : -1;
-		if (equals == -1) {
-			// no equals or ignore it
-			return arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
+		var equals = arg.IndexOf('=');
+		if (equals > -1) {
+			// contains equals, so take the first part eg "-kv=value" becomes "-kv"
+			arg = arg[..equals];
 		}
 
-		// contains equals
-		arg = arg[..equals];
 		return arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
 	}
 }
