@@ -31,7 +31,7 @@ namespace PicoArgs_dotnet;
 /// </remarks>
 public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 {
-	private readonly List<KeyValue> args = args.Select(a => KeyValue.Build(a, recogniseEquals)).ToList();
+	private readonly List<KeyValue> args = ProcessItems(args, recogniseEquals).ToList();
 	private bool finished;
 
 	/// <summary>
@@ -208,6 +208,14 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		if (finished) {
 			throw new PicoArgsException(70, "Cannot use PicoArgs after calling Finished()");
 		}
+	}
+
+	/// <summary>
+	/// Helper function to process the command line arguments
+	/// </summary>
+	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
+	{
+		return args.Select(a => KeyValue.Build(a, recogniseEquals));
 	}
 }
 
