@@ -6,7 +6,7 @@
     },
     "Normal": {
       "commandName": "Project",
-      "commandLineArgs": "-f file1.txt -f file2.txt --exclude something"
+      "commandLineArgs": "-r -f -s -i file1.txt -i file2.txt --exclude something"
     },
     "No params": {
       "commandName": "Project"
@@ -15,9 +15,17 @@
       "commandName": "Project",
       "commandLineArgs": "--rubbish"
     },
-    "Normal equals": {
+    "Equals": {
       "commandName": "Project",
-      "commandLineArgs": "-f=file1.txt --file=\"file2.txt\" --exclude something"
+      "commandLineArgs": "--fast --file=\"-something=else\" --file=-something=else -i=file1.txt --file=\"file2.txt\" -i another.txt --exclude \"something=else\""
+    },
+    "Combined switches": {
+      "commandName": "Project",
+      "commandLineArgs": "-rfs -i file1.txt -i file2.txt --exclude something"
+    },
+    "Combined with equals": {
+      "commandName": "Project",
+      "commandLineArgs": "-rfsi=file1.txt -i file2.txt --exclude something"
     }
   }
 }
