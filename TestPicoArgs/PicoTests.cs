@@ -304,13 +304,41 @@ public class PicoTests
 	[Fact(DisplayName = "Multi switch with quotes")]
 	public void MultiSwitchWithQuotes()
 	{
-		// we do not support multi-switches with quotes eg:
-		// -abc='codename' is an error
-		// =abc=codename is fine and becomes -a -b -c codename
+		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc='codename' --another", true);
+
+		var file = pico.GetParam("-f", "--file");
+		var code = pico.GetParam("-c", "--code");
+
+		var a = pico.Contains("-a");
+		var b = pico.Contains("-b");
+		var another = pico.Contains("--another");
+		var x = pico.Contains("-x");        // not specified
+
+		pico.Finished();
+
+		Assert.Equal("hello", file);
+		Assert.Equal("codename", code);
+		Assert.True(a);
+		Assert.True(b);
+		Assert.True(another);
+		Assert.False(x);
+	}
+
+	[Fact(DisplayName = "Multi switch not recognising equals")]
+	public void MultiSwitchNotRecogniseEquals()
+	{
+		var pico = SplitArgs.BuildFromSingleString("-abc=codename", false);
+
+		_ = pico.Contains("-a");
+		_ = pico.Contains("-b");
 
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
-			var pico = SplitArgs.BuildFromSingleString("--file=hello -abc='codename'", true);
-		}, "Multi-switches do not support quotes, and should throw", 90);
+			var code = pico.GetParam("-c", "--code");
+		}, "Should not be able to parse c=codename when equals not turned on", 10);
+
+		Helpers.AssertPicoThrows(() => {
+			pico.Finished();
+		}, "Since -c was not processed, Finnished() should throw", 60);
 	}
 }

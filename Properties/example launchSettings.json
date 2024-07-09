@@ -26,6 +26,10 @@
     "Combined with equals": {
       "commandName": "Project",
       "commandLineArgs": "-rfsi=file1.txt -i file2.txt --exclude something"
+    },
+    "Combined with quoted equals": {
+      "commandName": "Project",
+      "commandLineArgs": "-rfsi=\"file1.txt\" -i file2.txt --exclude something"
     }
   }
 }
