@@ -33,7 +33,8 @@ var pico = new PicoArgs(args); // construct with command line arguments string[]
 
 bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
 string[] files = pico.GetMultipleParams("-f", "--file"); // returns string[] with zero length if none found
-string exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude"; // specifying a default
+string filename = pico.GetParam("-f", "--file"); // throws if not specified
+string exclude = pico.GetParamOpt("-e", "--exclude") ?? "default"; // specifying a default
 
 pico.Finished(); // we are finished, check for extra unwanted arguments & throw is any are left over
 
@@ -42,7 +43,7 @@ pico.Finished(); // we are finished, check for extra unwanted arguments & throw 
 More examples can be found in the ```Program.cs``` file.
 
 
-There is a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may or may not be to your taste:
+There is a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may be to your taste:
 
 ```csharp
 using var pico = new PicoArgsDisposable(args);
@@ -51,8 +52,41 @@ bool raw = pico.Contains("-r", "--raw");
 // Finished() called to check for extra arguments, when pico goes out of scope
 ```
 
+## Suggested use pattern
+
+I like to use a simple wrapper function to handle the argument parsing and throw an exception if there are any extra arguments:
+
+```csharp
+private static ConfigOptions ParseConfig(string[] args)
+{
+    var pico = new PicoArgs(args);
+
+    if (pico.Contains("-h", "--help", "-?")) {
+        // help, no further parsing needed
+        Console.WriteLine(CommandLineMessage);
+        Environment.Exit(0);
+    }
+
+    // parse command line parameters
+    string? instance = pico.GetParamOpt("-i", "--instance") ?? Environment.GetEnvironmentVariable("INSTANCE");
+    string? database = pico.GetParamOpt("-d", "--database") ?? Environment.GetEnvironmentVariable("DATABASE");
+    bool singleThread = pico.Contains("-s", "--single-thread");
+
+    pico.Finished(); // throw if any unknown arguments
+
+    // ensure required parameters are present
+    if (string.IsNullOrWhiteSpace(instance) || string.IsNullOrWhiteSpace(database)) {
+        // or just throw here
+        Console.WriteLine(CommandLineMessage);
+        Environment.Exit(1);
+    }
+
+    return new ConfigOptions(instance, database, singleThread);
+}
+```
+
 ## Tests
 
 [![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml)
 
-Tests are written using xUnit and can be run with `dotnet test`. There is also a Github Actions workflow which runs the tests on push and pull request.
+Tests are written using xUnit and can be run with `dotnet test`.
