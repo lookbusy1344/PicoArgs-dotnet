@@ -76,10 +76,10 @@ public class PicoTests
 	[Fact(DisplayName = "Valid quoted values")]
 	public void QuotedValues()
 	{
-		var expected = new string[] { "item1", "item2", "item3", "item 4" };
-		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\"");
+		var expected = new string[] { "item1", "item2", "item3", "item 4", "-item 5", "--item=6" };
+		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\" --file=\"-item 5\" -f=\"--item=6\"");
 
-		var files = pico.GetMultipleParams("--file");
+		var files = pico.GetMultipleParams("-f", "--file");
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
