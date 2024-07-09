@@ -9,14 +9,19 @@ Like the Rust library, this library is intended to be used for small command lin
 
 PicoArgs-dotnet's features are intentionally very minimal:
 
-- Only one file to add, no dependencies
+- Only one file to add, no dependencies, very compact
 - Supports flags, options and positional arguments
-- Supports short and long options
-- Supports multiple values for options
+- Supports equivalent short and long options `-p` alias for `--print`
+- Supports combining short flags, e.g. `-abc` is equivalent to `-a` `-b` `-c` including with a trailing parameter `-abc=code` same as `-a` `-b` `-c code` (new in v1.5)
+- Supports multiple values for options `-f file1 -f file2`
+- Tiny API, a couple of hundred lines of code
+- Unit tests included
+- Branches for .NET 8 (main) and .NET 7 but should work with earlier versions
+
+Some intentional limitations:
+
 - NO support for default help generation, you need to do this manually
 - NO support for conversions, all arguments are strings (all flags are bools) unless you convert them yourself
-- Tiny API, about 120 lines of code
-- Written for .NET 8/7 but should work with earlier versions
 
 Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```Finished()```.
 
