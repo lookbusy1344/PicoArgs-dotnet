@@ -217,12 +217,12 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
 		foreach (var arg in args) {
-			var (multiple, _) = MultipleSwitches(arg);
-			if (multiple) {
-				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
+			var switches = CountCombinedSwitches(arg);
+			if (switches > 1) {
+				// split combined switches into individual switches eg "-abc" -> "-a" "-b" "-c"
 
 				if (arg.Contains('=')) {
-					// multiple switches, with equals eg "-abc=code"
+					// combined switches, with equals eg "-abc=code"
 
 					if (!recogniseEquals) {
 						// contains equals but we arent recognising them
@@ -260,9 +260,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Check if this is multiple switches eg -abc. This always respects '=' because its handled elsewhere
+	/// Check if combined switches eg -abc. Returns the number of combined switches eg 3. This always respects '=' because its handled elsewhere
 	/// </summary>
-	private static (bool multiple, int count) MultipleSwitches(string arg)
+	private static int CountCombinedSwitches(string arg)
 	{
 		var equals = arg.IndexOf('=');
 		if (equals > -1) {
@@ -270,13 +270,13 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			arg = arg[..equals];
 		}
 
-		var multiple = arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
-		if (multiple) {
+		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
 			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
-			return (true, arg.Length - 1);
+			// we have length-1 items eg "-abc" has 3 switches
+			return arg.Length - 1;
 		} else {
 			// just a standard single-switch
-			return (false, 1);
+			return 1;
 		}
 	}
 }
