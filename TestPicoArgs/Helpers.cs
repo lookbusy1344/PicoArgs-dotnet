@@ -7,11 +7,11 @@ internal static partial class Helpers
 	/// <summary>
 	/// Try the action, and assert that it throws the expected exception
 	/// </summary>
-	public static void AssertThrows<E>(Action action, string errmsg) where E : Exception
+	public static void AssertThrows<E>(Action action, string errMsg) where E : Exception
 	{
 		var result = CheckThrows<E>(action);
 		if (!result) {
-			Assert.Fail(errmsg);
+			Assert.Fail(errMsg);
 		} else {
 			Assert.True(true);
 		}
@@ -20,7 +20,7 @@ internal static partial class Helpers
 	/// <summary>
 	/// Try the action, and assert that it throws the expected PicArgsException and code
 	/// </summary>
-	public static void AssertPicoThrows(Action action, string errmsg, int? code)
+	public static void AssertPicoThrows(Action action, string errMsg, int? code)
 	{
 		var result = false; // assume test fails
 
@@ -40,7 +40,7 @@ internal static partial class Helpers
 		}
 
 		if (!result) {
-			Assert.Fail(errmsg);
+			Assert.Fail(errMsg);
 		} else {
 			Assert.True(true);
 		}

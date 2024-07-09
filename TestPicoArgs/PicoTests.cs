@@ -167,13 +167,13 @@ public class PicoTests
 		var verbose = pico.Contains("-v", "--verbose");
 		var file = pico.GetParam("-f", "--file");
 		var print = pico.GetCommand();
-		var notfound = pico.GetCommandOpt();    // a command that is not present, so should be null
+		var notFound = pico.GetCommandOpt();    // a command that is not present, so should be null
 		pico.Finished();
 
 		Assert.True(verbose);
 		Assert.Equal("file.txt", file);
 		Assert.Equal("PRINT", print);
-		Assert.Null(notfound);
+		Assert.Null(notFound);
 		Assert.True(pico.IsEmpty);
 	}
 
@@ -221,10 +221,10 @@ public class PicoTests
 		var pico = SplitArgs.BuildFromSingleString("--verbose=yes --something");
 
 		var something = pico.Contains("--something");
-		var notpresent = pico.Contains("--notpresent");
+		var notPresent = pico.Contains("--not-present");
 
 		Assert.True(something);
-		Assert.False(notpresent);
+		Assert.False(notPresent);
 
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
@@ -324,7 +324,7 @@ public class PicoTests
 		Assert.False(x);
 	}
 
-	[Fact(DisplayName = "Multi switch not recognising equals")]
+	[Fact(DisplayName = "Multi switch no equals recognition")]
 	public void MultiSwitchNotRecogniseEquals()
 	{
 		var pico = SplitArgs.BuildFromSingleString("-abc=codename", false);
@@ -335,10 +335,10 @@ public class PicoTests
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
 			var code = pico.GetParam("-c", "--code");
-		}, "Should not be able to parse c=codename when equals not turned on", 10);
+		}, "Should not be able to parse c=codename when equals recognition turned off", 10);
 
 		Helpers.AssertPicoThrows(() => {
 			pico.Finished();
-		}, "Since -c was not processed, Finnished() should throw", 60);
+		}, "Since -c was not processed, Finished() should throw", 60);
 	}
 }
