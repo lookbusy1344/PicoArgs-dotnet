@@ -217,7 +217,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
 		foreach (var arg in args) {
-			if (MultipleSwitches(arg)) {
+			var (multiple, _) = MultipleSwitches(arg);
+			if (multiple) {
 				// split multiple switches into individual switches eg "-abc" -> "-a" "-b" "-c"
 
 				if (arg.Contains('=')) {
@@ -261,7 +262,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Check if this is multiple switches eg -abc. This always respects '=' because its handled elsewhere
 	/// </summary>
-	private static bool MultipleSwitches(string arg)
+	private static (bool multiple, int count) MultipleSwitches(string arg)
 	{
 		var equals = arg.IndexOf('=');
 		if (equals > -1) {
@@ -269,7 +270,14 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			arg = arg[..equals];
 		}
 
-		return arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
+		var multiple = arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-';
+		if (multiple) {
+			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
+			return (true, arg.Length - 1);
+		} else {
+			// just a standard single-switch
+			return (false, 1);
+		}
 	}
 }
 
