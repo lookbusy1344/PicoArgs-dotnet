@@ -223,31 +223,15 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 				if (arg.Contains('=')) {
 					// combined switches, with equals eg "-abc=code"
-
-					if (!recogniseEquals) {
-						// contains equals but we arent recognising them
-						throw new PicoArgsException(90, $"Unexpected '=' in multi-switch \"{arg}\"");
+					// first process all but the last, eg -a -b but not -c=code
+					for (var c = 1; c < switches; ++c) {
+						yield return KeyValue.Build($"-{arg[c]}", false);
 					}
 
-					if (arg.Contains('\'') || arg.Contains('\"')) {
-						// contains quotes, which is not supported here
-						throw new PicoArgsException(90, $"Cannot handle multi-switch containing quotes \"{arg}\"");
-					}
-
-					var split = arg.Split(['='], 2);
-					if (split.Length != 2) {
-						throw new PicoArgsException(90, $"Cannot split \"{arg}\" into two on '='");
-					}
-
-					// append the switches before the equals eg "-abc"
-					foreach (var c in split[0][1..]) {
-						yield return KeyValue.Build($"-{c}", false);
-					}
-
-					// finally yield the appended value, after the equals eg "code"
-					yield return KeyValue.Build(split[1], false);
+					// finally yield the final param with equals eg "-c=code"
+					yield return KeyValue.Build($"-{arg[switches..]}", recogniseEquals);
 				} else {
-					// multiple switches, no equals or ignore equals eg "-abc"
+					// multiple switches, no equals eg "-abc"
 					foreach (var c in arg[1..]) {
 						yield return KeyValue.Build($"-{c}", false);
 					}
