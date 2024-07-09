@@ -228,7 +228,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 						yield return KeyValue.Build($"-{arg[c]}", false);
 					}
 
-					// finally yield the final param with equals eg "-c=code"
+					// finally yield the final param with equals eg "-c=code" or "-c='code'"
 					yield return KeyValue.Build($"-{arg[switches..]}", recogniseEquals);
 				} else {
 					// multiple switches, no equals eg "-abc"
