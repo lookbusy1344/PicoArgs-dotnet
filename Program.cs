@@ -38,11 +38,11 @@ internal static class Program
 				return;
 			}
 
-			var filesstr = string.Join(", ", files);
+			var filesString = string.Join(", ", files);
 			Console.WriteLine($"raw: {raw}");
 			Console.WriteLine($"fast: {fast}");
 			Console.WriteLine($"slow: {slow}");
-			Console.WriteLine($"files: {filesstr}");
+			Console.WriteLine($"files: {filesString}");
 			Console.WriteLine($"exclude: {exclude}");
 		}
 		catch (PicoArgsException ex) {
@@ -66,7 +66,7 @@ internal static class Program
 
 		var help = pico.Contains("-h", "-?", "--help");
 
-		// if we want help, just bail here, dont bother parsing the rest
+		// if we want help, just bail here, don't bother parsing the rest
 		if (help) {
 			return (true, null!, null!, false);
 		}

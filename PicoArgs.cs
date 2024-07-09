@@ -13,10 +13,10 @@
 
 	bool verbose = pico.Contains("-v", "--verbose");  // true if any of these switches are present
 	string? pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";  // optional parameter
-	string requiredpath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
+	string requirePath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
 	string[] files = pico.GetMultipleParams("-f", "--file");  // multiple parameters returned in string[]
 	string command = pico.GetCommand();  // first parameter, throws if not present
-	string? commandopt = pico.GetCommandOpt();  // first parameter, null if not present
+	string? commandOpt = pico.GetCommandOpt();  // first parameter, null if not present
 
 	pico.Finished();  // We are done. Throw if there are any unused parameters
 
@@ -97,13 +97,13 @@ public class PicoArgs
 
 	/// <summary>
 	/// Get a string value from the command line, throws is not present
-	/// eg -a "value" or --foldera "value"
+	/// eg -a "value" or --folder "value"
 	/// </summary>
 	public string GetParam(params string[] options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
 
 	/// <summary>
 	/// Get a string value from the command line, or null if not present
-	/// eg -a "value" or --foldera "value"
+	/// eg -a "value" or --folder "value"
 	/// </summary>
 	public string? GetParamOpt(params string[] options)
 	{
@@ -144,16 +144,16 @@ public class PicoArgs
 		}
 
 		// grab and check the next parameter
-		var seconditem = args[index + 1];
-		if (seconditem.Value != null) {
-			throw new PicoArgsException(30, $"Cannot identify value for param \"{item.Key}\", followed by \"{seconditem.Key}\" and \"{seconditem.Value}\"");
+		var secondItem = args[index + 1];
+		if (secondItem.Value != null) {
+			throw new PicoArgsException(30, $"Cannot identify value for param \"{item.Key}\", followed by \"{secondItem.Key}\" and \"{secondItem.Value}\"");
 		}
 
 		// consume the switch and the separate value
 		args.RemoveRange(index, 2);
 
 		// return the value
-		return seconditem.Key;
+		return secondItem.Key;
 	}
 
 	/// <summary>
