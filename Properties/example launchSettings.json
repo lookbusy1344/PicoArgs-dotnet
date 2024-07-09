@@ -15,10 +15,6 @@
       "commandName": "Project",
       "commandLineArgs": "--rubbish"
     },
-    "Equals": {
-      "commandName": "Project",
-      "commandLineArgs": "--fast --file=\"-something=else\" --file=-something=else -i=file1.txt --file=\"file2.txt\" -i another.txt --exclude \"something=else\""
-    },
     "Combined switches": {
       "commandName": "Project",
       "commandLineArgs": "-rfs -i file1.txt -i file2.txt --exclude something"
@@ -29,7 +25,11 @@
     },
     "Combined with quoted equals": {
       "commandName": "Project",
-      "commandLineArgs": "-rfsi=\"file1.txt\" -i file2.txt --exclude something"
+      "commandLineArgs": "-rfsi=\\\"file1.txt\\\" -i file2.txt --exclude something"
+    },
+    "Equals quoted": {
+      "commandName": "Project",
+      "commandLineArgs": "--fast --file=\\\"-something=else\\\" --file=-something=else -i=file1.txt --file=\\\"file2.txt\\\" -i another.txt --exclude \\\"something=else\\\""
     }
   }
 }
