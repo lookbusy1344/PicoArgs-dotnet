@@ -39,10 +39,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public bool Contains(params string[] options)
 	{
+		ValidateParams(options);
 		CheckFinished();
-		if (options == null || options.Length == 0) {
-			throw new ArgumentException("Must specify at least one option", nameof(options));
-		}
 
 		// no args left
 		if (args.Count == 0) {
@@ -50,10 +48,6 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		}
 
 		foreach (var o in options) {
-			if (!o.StartsWith('-')) {
-				throw new ArgumentException("Must start with -", nameof(options));
-			}
-
 			var index = args.FindIndex(a => a.Key == o);
 			if (index >= 0) {
 				// if this argument has a value, throw eg "--verbose=true" when we just expected "--verbose"
@@ -77,7 +71,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public string[] GetMultipleParams(params string[] options)
 	{
+		ValidateParams(options);
 		CheckFinished();
+
 		var result = new List<string>();
 		while (true) {
 			var s = GetParamOpt(options);
@@ -103,20 +99,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public string? GetParamOpt(params string[] options)
 	{
+		ValidateParams(options);
 		CheckFinished();
-		if (options == null || options.Length == 0) {
-			throw new ArgumentException("Must specify at least one option", nameof(options));
-		}
 
 		if (args.Count == 0) {
 			return null;
-		}
-
-		// check all options are switches
-		foreach (var o in options) {
-			if (!o.StartsWith('-')) {
-				throw new ArgumentException("Must start with -", nameof(options));
-			}
 		}
 
 		// do we have this switch on command line?
@@ -207,6 +194,31 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	{
 		if (finished) {
 			throw new PicoArgsException(70, "Cannot use PicoArgs after calling Finished()");
+		}
+	}
+
+	/// <summary>
+	/// Check options are valid, eg -a or --action
+	/// </summary>
+	private static void ValidateParams(string[] options)
+	{
+		if (options == null || options.Length == 0) {
+			throw new ArgumentException("Must specify at least one option", nameof(options));
+		}
+
+		foreach (var o in options) {
+			if (o.Length == 1 || !o.StartsWith('-')) {
+				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}", nameof(options));
+			}
+			if (o.Length > 2) {
+				if (o[1] != '-') {
+					// if it is longer than 2 characters, the second character must be a dash. eg -ab is invalid here (its already been expanded to -a -b)
+					throw new ArgumentException($"Long options must start with 2 dashes: {o}", nameof(options));
+				} else if (o[2] == '-') {
+					// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
+					throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
+				}
+			}
 		}
 	}
 
