@@ -372,4 +372,38 @@ public class PicoTests
 
 		pico.Finished();
 	}
+
+	[Fact(DisplayName = "Invalid input like --x or ---action")]
+	public void InvalidInput()
+	{
+		// first check good input
+		var pico = SplitArgs.BuildFromSingleString("-x --ok -ab");
+
+		var x = pico.Contains("-x");
+		var ok = pico.Contains("--ok");
+		var a = pico.Contains("-a");
+		var b = pico.Contains("-b");
+		var missing = pico.Contains("--missing");
+
+		pico.Finished();
+
+		Assert.True(x);
+		Assert.True(ok);
+		Assert.True(a);
+		Assert.True(b);
+		Assert.False(missing);
+
+		// now check some invalid inputs
+		Helpers.AssertPicoThrows(() => {
+			var fail = SplitArgs.BuildFromSingleString("-x --o");
+		}, "Should not parse --o", 90);
+
+		Helpers.AssertPicoThrows(() => {
+			var fail = SplitArgs.BuildFromSingleString("-x ---o");
+		}, "Should not parse ---o", 90);
+
+		Helpers.AssertPicoThrows(() => {
+			var fail = SplitArgs.BuildFromSingleString("-x ---another");
+		}, "Should not parse ---another", 90);
+	}
 }

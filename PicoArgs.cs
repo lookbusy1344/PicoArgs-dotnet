@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 1.6.0 - 17 Jul 2024
+    Version 1.6.1 - 17 Jul 2024
 
     Example usage:
 
@@ -40,7 +40,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public bool Contains(params string[] options)
 	{
-		ValidateParams(options);
+		ValidatePossibleParams(options);
 		CheckFinished();
 
 		// no args left
@@ -72,7 +72,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public string[] GetMultipleParams(params string[] options)
 	{
-		ValidateParams(options);
+		ValidatePossibleParams(options);
 		CheckFinished();
 
 		var result = new List<string>();
@@ -100,7 +100,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public string? GetParamOpt(params string[] options)
 	{
-		ValidateParams(options);
+		ValidatePossibleParams(options);
 		CheckFinished();
 
 		return GetParamInternal(options);
@@ -207,9 +207,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Check options are valid, eg -a or --action, but not -aa (already expanded) or ---action or --a
+	/// Check options are valid for Contains() or GetParam(), eg -a or --action, but not -aa (already expanded) or ---action or --a
 	/// </summary>
-	private static void ValidateParams(string[] options)
+	private static void ValidatePossibleParams(string[] options)
 	{
 		if (options == null || options.Length == 0) {
 			throw new ArgumentException("Must specify at least one option", nameof(options));
@@ -223,7 +223,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 				if (o[1] != '-') {
 					// if it is longer than 2 characters, the second character must be a dash. eg -ab is invalid here (its already been expanded to -a -b)
 					throw new ArgumentException($"Long options must start with 2 dashes: {o}", nameof(options));
-				} else if (o[2] == '-') {
+				}
+				if (o[2] == '-') {
 					// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
 					throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
 				}
@@ -290,22 +291,21 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Throw exception if this input param is not valid eg ---something or --x. Valid options are -a or -ab or --action
+	/// Validate this input param from command line. Invalid is ---something or --x. Valid options are -a or -ab or --action
 	/// </summary>
 	private static void ValidateInputParam(string arg)
 	{
-		if (!arg.StartsWith('-')) {
-			return; // this is not a switch
+		if (arg == "-") {
+			// a single dash is not valid
+			throw new PicoArgsException(90, "Parameter should not be a single dash");
 		}
-		if (arg.Length > 2) {
-			if (arg[2] == '-') {
-				// eg ---something is not valid
-				throw new PicoArgsException(90, $"Parameter should not start with 3 dashes: {arg}");
-			}
-			if (arg.Length == 3 && arg[1] == '-') {
-				// eg --a is not valid
-				throw new PicoArgsException(90, $"Long options must be 2 characters or more: {arg}");
-			}
+		if (arg.StartsWith("---")) {
+			// eg ---something is not valid
+			throw new PicoArgsException(90, $"Parameter should not start with 3 dashes: {arg}");
+		}
+		if (arg.Length == 3 && arg.StartsWith("--")) {
+			// eg --a is not valid
+			throw new PicoArgsException(90, $"Long options must be 2 characters or more: {arg}");
 		}
 	}
 }
