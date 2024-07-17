@@ -76,7 +76,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 		var result = new List<string>();
 		while (true) {
-			var s = GetParamOpt(options);
+			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
 			if (s == null) {
 				break;   // nothing else found, break out of loop
 			}
@@ -102,6 +102,14 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		ValidateParams(options);
 		CheckFinished();
 
+		return GetParamInternal(options);
+	}
+
+	/// <summary>
+	/// Internal version of GetParamOpt, which does not check for valid options
+	/// </summary>
+	private string? GetParamInternal(string[] options)
+	{
 		if (args.Count == 0) {
 			return null;
 		}
