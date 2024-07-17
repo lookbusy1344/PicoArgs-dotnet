@@ -206,7 +206,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Check options are valid, eg -a or --action
+	/// Check options are valid, eg -a or --action, but not -aa (already expanded) or ---action or --a
 	/// </summary>
 	private static void ValidateParams(string[] options)
 	{
@@ -225,6 +225,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 				} else if (o[2] == '-') {
 					// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
 					throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
+				}
+				if (o.Length == 3) {
+					throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
 				}
 			}
 		}

@@ -362,9 +362,9 @@ public class PicoTests
 			var code = pico.Contains("-x", "-xsomething");
 		}, "-xsomething is not a valid option");
 
-		//Helpers.AssertThrows<ArgumentException>(() => {
-		//	var code = pico.Contains("-x", "--x");
-		//}, "--x is not a valid option");
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.Contains("-x", "--x");
+		}, "--x is not a valid option");
 
 		pico.Finished();
 	}
