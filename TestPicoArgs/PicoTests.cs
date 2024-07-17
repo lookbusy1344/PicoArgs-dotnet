@@ -342,7 +342,7 @@ public class PicoTests
 		}, "Since -c was not processed, Finished() should throw", 60);
 	}
 
-	[Fact(DisplayName = "Invalid params like -xsomething")]
+	[Fact(DisplayName = "Invalid params like -something")]
 	public void InvalidParams()
 	{
 		var pico = SplitArgs.BuildFromSingleString("--hello --world");
@@ -351,16 +351,20 @@ public class PicoTests
 		_ = pico.Contains("-w", "--world");
 
 		Helpers.AssertThrows<ArgumentException>(() => {
-			var code = pico.GetParam("-x", "-xsomething");
-		}, "-xsomething is not a valid param");
+			var code = pico.GetParam("-s", "-something");
+		}, "-something is not a valid param");
 
 		Helpers.AssertThrows<ArgumentException>(() => {
-			var code = pico.GetParam("-x", "---xsomething");
-		}, "---xsomething is not a valid param");
+			var code = pico.Contains("something");
+		}, "something is not a valid param, no dash");
 
 		Helpers.AssertThrows<ArgumentException>(() => {
-			var code = pico.Contains("-x", "-xsomething");
-		}, "-xsomething is not a valid option");
+			var code = pico.GetParam("---something");
+		}, "---something is not a valid param");
+
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.Contains("-something");
+		}, "-something is not a valid option");
 
 		Helpers.AssertThrows<ArgumentException>(() => {
 			var code = pico.Contains("-x", "--x");
