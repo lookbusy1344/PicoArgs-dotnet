@@ -3,7 +3,7 @@
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 1.5.1 - 09 Jul 2024
+    Version 1.6.0 - 17 Jul 2024
 
 	Legacy version for .NET 7 (check main branch for latest version)
 
@@ -12,7 +12,8 @@
 	var pico = new PicoArgs(args);
 
 	bool verbose = pico.Contains("-v", "--verbose");  // true if any of these switches are present
-	string? pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";  // optional parameter
+	string? patternOpt = pico.GetParamOpt("-t", "--pattern");  // optional parameter
+	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";  // optional parameter with default
 	string requirePath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
 	string[] files = pico.GetMultipleParams("-f", "--file");  // multiple parameters returned in string[]
 	string command = pico.GetCommand();  // first parameter, throws if not present
@@ -43,10 +44,8 @@ public class PicoArgs
 	/// </summary>
 	public bool Contains(params string[] options)
 	{
+		ValidateParams(options);
 		CheckFinished();
-		if (options == null || options.Length == 0) {
-			throw new ArgumentException("Must specify at least one option", nameof(options));
-		}
 
 		// no args left
 		if (args.Count == 0) {
@@ -54,10 +53,6 @@ public class PicoArgs
 		}
 
 		foreach (var o in options) {
-			if (!o.StartsWith('-')) {
-				throw new ArgumentException("Must start with -", nameof(options));
-			}
-
 			var index = args.FindIndex(a => a.Key == o);
 			if (index >= 0) {
 				// if this argument has a value, throw eg "--verbose=true" when we just expected "--verbose"
@@ -81,10 +76,12 @@ public class PicoArgs
 	/// </summary>
 	public string[] GetMultipleParams(params string[] options)
 	{
+		ValidateParams(options);
 		CheckFinished();
+
 		var result = new List<string>();
 		while (true) {
-			var s = GetParamOpt(options);
+			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
 			if (s == null) {
 				break;   // nothing else found, break out of loop
 			}
@@ -107,20 +104,19 @@ public class PicoArgs
 	/// </summary>
 	public string? GetParamOpt(params string[] options)
 	{
+		ValidateParams(options);
 		CheckFinished();
-		if (options == null || options.Length == 0) {
-			throw new ArgumentException("Must specify at least one option", nameof(options));
-		}
 
+		return GetParamInternal(options);
+	}
+
+	/// <summary>
+	/// Internal version of GetParamOpt, which does not check for valid options
+	/// </summary>
+	private string? GetParamInternal(string[] options)
+	{
 		if (args.Count == 0) {
 			return null;
-		}
-
-		// check all options are switches
-		foreach (var o in options) {
-			if (!o.StartsWith('-')) {
-				throw new ArgumentException("Must start with -", nameof(options));
-			}
 		}
 
 		// do we have this switch on command line?
@@ -211,6 +207,34 @@ public class PicoArgs
 	{
 		if (finished) {
 			throw new PicoArgsException(70, "Cannot use PicoArgs after calling Finished()");
+		}
+	}
+
+	/// <summary>
+	/// Check options are valid, eg -a or --action, but not -aa (already expanded) or ---action or --a
+	/// </summary>
+	private static void ValidateParams(string[] options)
+	{
+		if (options == null || options.Length == 0) {
+			throw new ArgumentException("Must specify at least one option", nameof(options));
+		}
+
+		foreach (var o in options) {
+			if (o.Length == 1 || !o.StartsWith('-')) {
+				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}", nameof(options));
+			}
+			if (o.Length > 2) {
+				if (o[1] != '-') {
+					// if it is longer than 2 characters, the second character must be a dash. eg -ab is invalid here (its already been expanded to -a -b)
+					throw new ArgumentException($"Long options must start with 2 dashes: {o}", nameof(options));
+				} else if (o[2] == '-') {
+					// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
+					throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
+				}
+				if (o.Length == 3) {
+					throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
+				}
+			}
 		}
 	}
 

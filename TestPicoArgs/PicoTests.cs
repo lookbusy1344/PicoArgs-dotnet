@@ -341,4 +341,35 @@ public class PicoTests
 			pico.Finished();
 		}, "Since -c was not processed, Finished() should throw", 60);
 	}
+
+	[Fact(DisplayName = "Invalid params like -something")]
+	public void InvalidParams()
+	{
+		var pico = SplitArgs.BuildFromSingleString("--hello --world");
+
+		_ = pico.Contains("-h", "--hello");
+		_ = pico.Contains("-w", "--world");
+
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.GetParam("-s", "-something");
+		}, "-something is not a valid param");
+
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.Contains("something");
+		}, "something is not a valid param, no dash");
+
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.GetParam("---something");
+		}, "---something is not a valid param");
+
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.Contains("-something");
+		}, "-something is not a valid option");
+
+		Helpers.AssertThrows<ArgumentException>(() => {
+			var code = pico.Contains("-x", "--x");
+		}, "--x is not a valid option");
+
+		pico.Finished();
+	}
 }
