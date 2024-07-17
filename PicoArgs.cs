@@ -241,6 +241,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
 		foreach (var arg in args) {
+			ValidateInputParam(arg);
+
 			var switches = CountCombinedSwitches(arg);
 			if (switches > 1) {
 				// split combined switches into individual switches eg "-abc" -> "-a" "-b" "-c"
@@ -284,6 +286,26 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		} else {
 			// just a standard single-switch
 			return 1;
+		}
+	}
+
+	/// <summary>
+	/// Throw exception if this input param is not valid eg ---something or --x. Valid options are -a or -ab or --action
+	/// </summary>
+	private static void ValidateInputParam(string arg)
+	{
+		if (!arg.StartsWith('-')) {
+			return; // this is not a switch
+		}
+		if (arg.Length > 2) {
+			if (arg[2] == '-') {
+				// eg ---something is not valid
+				throw new PicoArgsException(90, $"Parameter should not start with 3 dashes: {arg}");
+			}
+			if (arg.Length == 3 && arg[1] == '-') {
+				// eg --a is not valid
+				throw new PicoArgsException(90, $"Long options must be 2 characters or more: {arg}");
+			}
 		}
 	}
 }
