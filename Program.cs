@@ -5,8 +5,8 @@ internal static class Program
 	private static void Main(string[] args)
 	{
 		Console.WriteLine("Demo of PicoArgs.cs class, eg:");
-		Console.WriteLine("PicoArgs-dotnet.exe --raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
-		Console.WriteLine("PicoArgs-dotnet.exe --raw -f=file1.txt -f=\"file 2.txt\" --file file3.txt -f=\"-something=else\" --exclude=\"something else\"");
+		Console.WriteLine("PicoArgs-dotnet.exe --raw -i file1.txt -i file2.txt --file file3.txt --exclude something");
+		Console.WriteLine("PicoArgs-dotnet.exe --raw -i=file1.txt -i=\"file 2.txt\" --file file3.txt -i=\"-something=else\" --exclude=\"something else\"");
 
 		try {
 			//var pico = new PicoArgs("--raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
