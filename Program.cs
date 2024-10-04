@@ -25,7 +25,7 @@ internal static class Program
 			var fast = pico.Contains("-f", "--fast");
 			var slow = pico.Contains("-s", "--slow");
 
-			var files = pico.GetMultipleParams("-i", "--file");
+			var files = pico.GetMultipleParams("-i", "--file").ToArray();
 			var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
 
 			// we have finished, make sure there are no unused arguments

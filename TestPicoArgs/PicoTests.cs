@@ -42,7 +42,7 @@ public class PicoTests
 		var expected = new string[] { "file.txt", "another.txt", "again.txt" };
 		var pico = SplitArgs.BuildFromSingleString("-f file.txt --junk xxx --file another.txt -f again.txt");
 
-		var files = pico.GetMultipleParams("-f", "--file");
+		var files = pico.GetMultipleParams("-f", "--file").ToArray();
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
@@ -66,7 +66,7 @@ public class PicoTests
 		var expected = new string[] { "file.txt", "-something=else" };
 		var pico = SplitArgs.BuildFromSingleString("--file=file.txt --file=-something=else");
 
-		var files = pico.GetMultipleParams("-f", "--file");
+		var files = pico.GetMultipleParams("-f", "--file").ToArray();
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
@@ -79,7 +79,7 @@ public class PicoTests
 		var expected = new string[] { "item1", "item2", "item3", "item 4", "-item 5", "--item=6" };
 		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\" --file=\"-item 5\" -f=\"--item=6\"");
 
-		var files = pico.GetMultipleParams("-f", "--file");
+		var files = pico.GetMultipleParams("-f", "--file").ToArray();
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
@@ -93,7 +93,7 @@ public class PicoTests
 		var expected = new string[] { "\"item1'", "'item2\"" };
 		var pico = new PicoArgs(["--file=\"item1'", "--file='item2\""]);
 
-		var files = pico.GetMultipleParams("--file");
+		var files = pico.GetMultipleParams("--file").ToArray();
 
 		var match = Helpers.CompareNames(expected, files);
 		Assert.True(match);
