@@ -39,7 +39,7 @@ public class PicoTests
 	[Fact(DisplayName = "GetMultipleParams test")]
 	public void MultipleTest()
 	{
-		var expected = new string[] { "file.txt", "another.txt", "again.txt" };
+		string[] expected = ["file.txt", "another.txt", "again.txt"];
 		var pico = SplitArgs.BuildFromSingleString("-f file.txt --junk xxx --file another.txt -f again.txt");
 
 		var files = pico.GetMultipleParams("-f", "--file").ToArray();
@@ -63,7 +63,7 @@ public class PicoTests
 	[Fact(DisplayName = "Using equals and complex value")]
 	public void ComplexValue()
 	{
-		var expected = new string[] { "file.txt", "-something=else" };
+		string[] expected = ["file.txt", "-something=else"];
 		var pico = SplitArgs.BuildFromSingleString("--file=file.txt --file=-something=else");
 
 		var files = pico.GetMultipleParams("-f", "--file").ToArray();
@@ -76,7 +76,7 @@ public class PicoTests
 	[Fact(DisplayName = "Valid quoted values")]
 	public void QuotedValues()
 	{
-		var expected = new string[] { "item1", "item2", "item3", "item 4", "-item 5", "--item=6" };
+		string[] expected = ["item1", "item2", "item3", "item 4", "-item 5", "--item=6"];
 		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\" --file=\"-item 5\" -f=\"--item=6\"");
 
 		var files = pico.GetMultipleParams("-f", "--file").ToArray();
@@ -90,7 +90,7 @@ public class PicoTests
 	public void InvalidQuotedValues()
 	{
 		// these quotes do not match, so are not parsed
-		var expected = new string[] { "\"item1'", "'item2\"" };
+		string[] expected = ["\"item1'", "'item2\""];
 		var pico = new PicoArgs(["--file=\"item1'", "--file='item2\""]);
 
 		var files = pico.GetMultipleParams("--file").ToArray();
@@ -103,7 +103,6 @@ public class PicoTests
 	[Fact(DisplayName = "Using equals and complex value, when not enabled")]
 	public void ComplexValueFail()
 	{
-		//var expected = new string[] { "file.txt", "-something=else" };
 		var pico = SplitArgs.BuildFromSingleString("--file=file.txt --file=-something=else", false);
 
 		var files = pico.GetMultipleParams("-f", "--file");
@@ -180,7 +179,7 @@ public class PicoTests
 	[Fact(DisplayName = "Argument splitting")]
 	public void ArgumentSplitting()
 	{
-		var expected = new string[] { "once", "upon", "a", "time", "in Hollywood" };
+		string[] expected = ["once", "upon", "a", "time", "in Hollywood"];
 		var pico = SplitArgs.BuildFromSingleString("once upon a time \"in Hollywood\"");
 
 		var content = pico.UnconsumedArgs.Select(a => a.Key).ToArray();
@@ -191,8 +190,8 @@ public class PicoTests
 	[Fact(DisplayName = "Key / value splitting in detail")]
 	public void KVCheck()
 	{
-		var expected = new KeyValue[] { new("--file", "file1.txt"), new("--print", null),
-			new("something", null), new("--verbose", "yes") };
+		KeyValue[] expected = [ new("--file", "file1.txt"), new("--print", null),
+			new("something", null), new("--verbose", "yes") ];
 		var pico = SplitArgs.BuildFromSingleString("--file=file1.txt --print something --verbose=yes");
 
 		var match = expected.SequenceEqual(pico.UnconsumedArgs);
