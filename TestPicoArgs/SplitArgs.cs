@@ -36,12 +36,12 @@ internal static partial class SplitArgsImplementation
 	 * Windows native CommandLineToArgvW
 	 * Copied from https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp#answer-749653
 	 */
-	[LibraryImport("shell32.dll", SetLastError = true)]
-	private static partial IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
+	[LibraryImport("shell32.dll", SetLastError = true, EntryPoint = "CommandLineToArgvW")]
+	private static extern IntPtr CommandLineToArgvW_Win32([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
 
 	internal static string[] CommandLineToArgvW(string commandLine)
 	{
-		var argv = CommandLineToArgvW(commandLine, out var argc);
+		var argv = CommandLineToArgvW_Win32(commandLine, out var argc);
 		if (argv == IntPtr.Zero) {
 			throw new System.ComponentModel.Win32Exception();
 		}
