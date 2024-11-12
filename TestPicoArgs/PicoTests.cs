@@ -105,7 +105,7 @@ public class PicoTests
 	{
 		var pico = SplitArgs.BuildFromSingleString("--file=file.txt --file=-something=else", false);
 
-		var files = pico.GetMultipleParams("-f", "--file");
+		var files = pico.GetMultipleParams("-f", "--file").ToArray();
 
 		Assert.Empty(files);
 	}
