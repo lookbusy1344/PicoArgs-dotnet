@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 2.0.1 - 04 Oct 2024
+    Version 2.0.99 - 26 Nov 2024
 
     Example usage:
 
@@ -38,8 +38,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Get a boolean value from the command line, returns TRUE if found
 	/// </summary>
-	public bool Contains(params string[] options)
+	public bool Contains(params IEnumerable<string> options)
 	{
+		ArgumentNullException.ThrowIfNull(options);
 		ValidatePossibleParams(options);
 		CheckFinished();
 
@@ -70,8 +71,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// Get multiple parameters from the command line, or empty array if not present
 	/// eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
-	public IEnumerable<string> GetMultipleParams(params string[] options)
+	public IEnumerable<string> GetMultipleParams(params IEnumerable<string> options)
 	{
+		ArgumentNullException.ThrowIfNull(options);
 		ValidatePossibleParams(options);
 		CheckFinished();
 
@@ -89,14 +91,15 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// Get a string value from the command line, throws is not present
 	/// eg -a "value" or --folder "value"
 	/// </summary>
-	public string GetParam(params string[] options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
+	public string GetParam(params IEnumerable<string> options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
 
 	/// <summary>
 	/// Get a string value from the command line, or null if not present
 	/// eg -a "value" or --folder "value"
 	/// </summary>
-	public string? GetParamOpt(params string[] options)
+	public string? GetParamOpt(params IEnumerable<string> options)
 	{
+		ArgumentNullException.ThrowIfNull(options);
 		ValidatePossibleParams(options);
 		CheckFinished();
 
@@ -106,7 +109,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Internal version of GetParamOpt, which does not check for valid options
 	/// </summary>
-	private string? GetParamInternal(string[] options)
+	private string? GetParamInternal(IEnumerable<string> options)
 	{
 		if (args.Count == 0) {
 			return null;
@@ -206,13 +209,13 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Check options are valid for Contains() or GetParam(), eg -a or --action, but not -aa (already expanded) or ---action or --a
 	/// </summary>
-	private static void ValidatePossibleParams(string[] options)
+	private static void ValidatePossibleParams(IEnumerable<string> options)
 	{
-		if (options == null || options.Length == 0) {
-			throw new ArgumentException("Must specify at least one option", nameof(options));
-		}
+		var any = false;
 
 		foreach (var o in options) {
+			any = true;
+
 			if (o.Length == 1 || !o.StartsWith('-')) {
 				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}", nameof(options));
 			}
@@ -229,6 +232,10 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 					throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
 				}
 			}
+		}
+
+		if (!any) {
+			throw new ArgumentException("Must specify at least one option", nameof(options));
 		}
 	}
 
