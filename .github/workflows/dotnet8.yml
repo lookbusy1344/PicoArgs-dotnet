@@ -2,10 +2,10 @@ name: PicoArgs compile and test
 
 on:
   push:
-    branches: [ "dotnet7" ]
+    branches: [ "dotnet8" ]
 
   pull_request:
-    branches: [ "dotnet7" ]
+    branches: [ "dotnet8" ]
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '8.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
