@@ -77,13 +77,19 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		ValidatePossibleParams(options);
 		CheckFinished();
 
-		while (true) {
-			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
-			if (s == null) {
-				break;   // nothing else found, break out of loop
-			}
+		return InternalGetMultipleParams();
 
-			yield return s;
+		// Inner function to avoid RCS1227, need to validate the params before returning IEnumerable
+		IEnumerable<string> InternalGetMultipleParams()
+		{
+			while (true) {
+				var s = GetParamInternal(options);  // Internal call, because we have already validated the options
+				if (s == null) {
+					break;   // nothing else found, break out of loop
+				}
+
+				yield return s;
+			}
 		}
 	}
 
@@ -211,10 +217,10 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static void ValidatePossibleParams(IEnumerable<string> options)
 	{
-		var any = false;
+		var empty = true;
 
 		foreach (var o in options) {
-			any = true;
+			empty = false;
 
 			if (o.Length == 1 || !o.StartsWith('-')) {
 				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}", nameof(options));
@@ -234,7 +240,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			}
 		}
 
-		if (!any) {
+		if (empty) {
 			throw new ArgumentException("Must specify at least one option", nameof(options));
 		}
 	}
