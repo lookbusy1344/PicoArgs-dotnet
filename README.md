@@ -32,7 +32,7 @@ No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code
 var pico = new PicoArgs(args); // construct with command line arguments string[]
 
 bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
-string[] files = pico.GetMultipleParams("-f", "--file").ToArray(); // string[] with zero length if none found
+IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file"); // zero length if none found
 string filename = pico.GetParam("-f", "--file"); // throws if not specified
 string exclude = pico.GetParamOpt("-e", "--exclude") ?? "default"; // specifying a default
 

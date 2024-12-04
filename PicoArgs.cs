@@ -13,7 +13,7 @@ namespace PicoArgs_dotnet;
 	string? patternOpt = pico.GetParamOpt("-t", "--pattern");  // optional parameter
 	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";  // optional parameter with default
 	string requirePath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
-	string[] files = pico.GetMultipleParams("-f", "--file").ToArray();  // yield multiple parameters, converting to an array
+	IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file");  // get multiple parameters eg -f file1 -f file2
 	string command = pico.GetCommand();  // first parameter, throws if not present
 	string? commandOpt = pico.GetCommandOpt();  // first parameter, null if not present
 
