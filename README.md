@@ -95,19 +95,27 @@ In .NET 9 the API has been updated to use `params ReadOnlySpan<string> options` 
 // As-written code:
 bool raw = pico.Contains("-r", "--raw");
 
-// Desugared code:
+// ===========================================================
+// Desugared code (simplified):
 
-// create a struct with 2 string references, on the stack
-InlineArray2 buffer;
+// elsewhere - define inline array of 2 strings
+[System.Runtime.CompilerServices.InlineArray(2)]
+struct InlineArray
+{
+	private string _element0;
+}
 
-// populate the struct with "-r" and "--raw"
-InlineArrayElementRef<InlineArray2, string>(ref buffer, 0) = "-r";
-InlineArrayElementRef<InlineArray2, string>(ref buffer, 1) = "--raw";
+// create the buffer on the stack
+InlineArray buffer;
 
-// call Contains() method and pass thr struct as a ReadOnlySpan
-bool raw = pico.Contains(InlineArrayAsReadOnlySpan<InlineArray2, string>(ref buffer, 2));
+// populate the buffer with "-r" and "--raw"
+buffer[0] = "-r";
+buffer[1] = "--raw";
 
-// Note, no array to garbage collect
+// call Contains() method and pass inline array as a ReadOnlySpan
+bool raw = pico.Contains(buffer);
+
+// Note, no array to garbage collect. Just cleaned up with the stack frame.
 ```
 
 Before .NET 9, the code would have looked like this:
@@ -115,17 +123,28 @@ Before .NET 9, the code would have looked like this:
 ```csharp
 // .NET 8 VERSION
 
-// As-written code:
+// Same as-written code:
 bool raw = pico.Contains("-r", "--raw");
 
+// ===========================================================
 // Desugared code:
+
+// heap-allocate an array
 string[] array = new string[2];
+
+// populate the array with "-r" and "--raw"
 array[0] = "-r";
 array[1] = "--raw";
+
+// call Contains() method and pass the array
 bool raw = pico.Contains(array);
 
 // array now requires garbage collection
 ```
+
+This looks shorter but its less efficient because of the additional heap allocation.
+
+See https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-9/#span-span-and-more-span for more information.
 
 ## Tests
 
