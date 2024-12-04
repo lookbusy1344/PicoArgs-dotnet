@@ -25,14 +25,14 @@ internal static class Program
 			var fast = pico.Contains("-f", "--fast");
 			var slow = pico.Contains("-s", "--slow");
 
-			var files = pico.GetMultipleParams("-i", "--file").ToArray();
+			var files = pico.GetMultipleParams("-i", "--file");
 			var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
 
 			// we have finished, make sure there are no unused arguments
 			pico.Finished();
 
 			// show the results
-			if (files.Length == 0) {
+			if (files.Count == 0) {
 				Console.WriteLine(HelpMessage);
 				Console.WriteLine("\r\nNo files specified");
 				return;

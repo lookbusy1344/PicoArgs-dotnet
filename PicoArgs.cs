@@ -67,30 +67,25 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Get multiple parameters from the command line, or empty array if not present
+	/// Get multiple parameters from the command line, or empty list if not present
 	/// eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
-	public IEnumerable<string> GetMultipleParams(params ReadOnlySpan<string> options)
+	public IReadOnlyList<string> GetMultipleParams(params ReadOnlySpan<string> options)
 	{
 		ValidatePossibleParams(options);
 		CheckFinished();
 
-		return GetMultipleParamsInternal(options);
-	}
-
-	/// <summary>
-	/// Internal worker function to avoid RCS1227, need to validate the params before returning IEnumerable
-	/// </summary>
-	private IEnumerable<string> GetMultipleParamsInternal(ReadOnlySpan<string> options)
-	{
+		var result = new List<string>();
 		while (true) {
 			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
 			if (s == null) {
 				break;   // nothing else found, break out of loop
+			} else {
+				result.Add(s);
 			}
-
-			yield return s;
 		}
+
+		return result;
 	}
 
 	/// <summary>
