@@ -75,7 +75,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		ValidatePossibleParams(options);
 		CheckFinished();
 
-		var result = new List<string>();
+		var result = new List<string>(4);
 		while (true) {
 			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
 			if (s == null) {
@@ -216,11 +216,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static void ValidatePossibleParams(ReadOnlySpan<string> options)
 	{
-		var empty = true;
+		if (options.IsEmpty) {
+			throw new ArgumentException("Must specify at least one option", nameof(options));
+		}
 
 		foreach (var o in options) {
-			empty = false;
-
 			if (o.Length == 1 || !o.StartsWith('-')) {
 				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}", nameof(options));
 			}
@@ -237,10 +237,6 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 					throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
 				}
 			}
-		}
-
-		if (empty) {
-			throw new ArgumentException("Must specify at least one option", nameof(options));
 		}
 	}
 
