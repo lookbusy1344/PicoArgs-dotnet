@@ -111,25 +111,18 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private string? GetParamInternal(ReadOnlySpan<string> options)
 	{
-		if (args.Count == 0) {
-			return null;
+		// does args contain any of the specified options? Can't use a lambda because of ref struct
+		var index = -1;
+		for (var i = 0; i < args.Count; ++i) {
+			if (options.Contains(args[i].Key)) {
+				// options contains this key, so we have a match. Record the index and break
+				index = i;
+				break;
+			}
 		}
 
-		// do we have this switch on command line? Can't use a lambda because options is ref struct
-		var optionArray = options.ToArray();
-		var index = args.FindIndex(a => optionArray.Contains(a.Key));
-
-		// *** FIX THIS
-
-		//var index = -1;
-		//foreach (var a in args) {
-		//	index = options.IndexOf(a.Key);
-		//	if (index >= 0) {
-		//		break;
-		//	}
-		//}
-
 		if (index == -1) {
+			// not found
 			return null;
 		}
 
