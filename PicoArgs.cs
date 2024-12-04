@@ -70,24 +70,26 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// Get multiple parameters from the command line, or empty array if not present
 	/// eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
-	public IEnumerable<string> GetMultipleParams(params string[] options)
+	public IEnumerable<string> GetMultipleParams(params ReadOnlySpan<string> options)
 	{
 		ValidatePossibleParams(options);
 		CheckFinished();
 
-		return InternalGetMultipleParams();
+		return GetMultipleParamsInternal(options);
+	}
 
-		// Inner function to avoid RCS1227, need to validate the params before returning IEnumerable
-		IEnumerable<string> InternalGetMultipleParams()
-		{
-			while (true) {
-				var s = GetParamInternal(options);  // Internal call, because we have already validated the options
-				if (s == null) {
-					break;   // nothing else found, break out of loop
-				}
-
-				yield return s;
+	/// <summary>
+	/// Internal worker function to avoid RCS1227, need to validate the params before returning IEnumerable
+	/// </summary>
+	private IEnumerable<string> GetMultipleParamsInternal(ReadOnlySpan<string> options)
+	{
+		while (true) {
+			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
+			if (s == null) {
+				break;   // nothing else found, break out of loop
 			}
+
+			yield return s;
 		}
 	}
 
@@ -121,6 +123,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		// do we have this switch on command line? Can't use a lambda because options is ref struct
 		var optionArray = options.ToArray();
 		var index = args.FindIndex(a => optionArray.Contains(a.Key));
+
+		// *** FIX THIS
 
 		//var index = -1;
 		//foreach (var a in args) {
