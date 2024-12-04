@@ -32,7 +32,7 @@ No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code
 var pico = new PicoArgs(args); // construct with command line arguments string[]
 
 bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
-string[] files = pico.GetMultipleParams("-f", "--file").ToArray(); // string[] with zero length if none found
+IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file"); // zero length if none found
 string filename = pico.GetParam("-f", "--file"); // throws if not specified
 string exclude = pico.GetParamOpt("-e", "--exclude") ?? "default"; // specifying a default
 
@@ -83,6 +83,48 @@ private static ConfigOptions ParseConfig(string[] args)
 
     return new ConfigOptions(instance, database, singleThread);
 }
+```
+
+## .NET 9 improvements with ReadOnlySpan
+
+In .NET 9 the API has been updated to use `params ReadOnlySpan<string> options` instead of `params string[] options`. Since possible command line options are almost always constant, this allows great optimization by using stack-allocated inline arrays of strings, instead of heap-allocated arrays. The generated code then looks something like this:
+
+```csharp
+// .NET 9 VERSION
+
+// As-written code:
+bool raw = pico.Contains("-r", "--raw");
+
+// Desugared code:
+
+// create a struct with 2 string references, on the stack
+InlineArray2 buffer;
+
+// populate the struct with "-r" and "--raw"
+InlineArrayElementRef<InlineArray2, string>(ref buffer, 0) = "-r";
+InlineArrayElementRef<InlineArray2, string>(ref buffer, 1) = "--raw";
+
+// call Contains() method and pass thr struct as a ReadOnlySpan
+bool raw = pico.Contains(InlineArrayAsReadOnlySpan<InlineArray2, string>(ref buffer, 2));
+
+// Note, no array to garbage collect
+```
+
+Before .NET 9, the code would have looked like this:
+
+```csharp
+// .NET 8 VERSION
+
+// As-written code:
+bool raw = pico.Contains("-r", "--raw");
+
+// Desugared code:
+string[] array = new string[2];
+array[0] = "-r";
+array[1] = "--raw";
+bool raw = pico.Contains(array);
+
+// array now requires garbage collection
 ```
 
 ## Tests
