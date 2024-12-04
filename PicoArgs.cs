@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.0.0 - 27 Nov 2024
+    Version 3.0.1 - 04 Dec 2024
 
     Example usage:
 
@@ -38,9 +38,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Get a boolean value from the command line, returns TRUE if found
 	/// </summary>
-	public bool Contains(params IEnumerable<string> options)
+	public bool Contains(params ReadOnlySpan<string> options)
 	{
-		ArgumentNullException.ThrowIfNull(options);
 		ValidatePossibleParams(options);
 		CheckFinished();
 
@@ -54,7 +53,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			if (index >= 0) {
 				// if this argument has a value, throw eg "--verbose=true" when we just expected "--verbose"
 				if (args[index].Value != null) {
-					throw new PicoArgsException(80, $"Unexpected value for \"{string.Join(", ", options)}\"");
+					throw new PicoArgsException(80, $"Unexpected value for \"{string.Join(", ", options.ToArray())}\"");
 				}
 
 				// found switch so consume it and return
@@ -71,9 +70,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// Get multiple parameters from the command line, or empty array if not present
 	/// eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
-	public IEnumerable<string> GetMultipleParams(params IEnumerable<string> options)
+	public IEnumerable<string> GetMultipleParams(params string[] options)
 	{
-		ArgumentNullException.ThrowIfNull(options);
 		ValidatePossibleParams(options);
 		CheckFinished();
 
@@ -97,15 +95,14 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// Get a string value from the command line, throws is not present
 	/// eg -a "value" or --folder "value"
 	/// </summary>
-	public string GetParam(params IEnumerable<string> options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
+	public string GetParam(params ReadOnlySpan<string> options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options.ToArray())}\"");
 
 	/// <summary>
 	/// Get a string value from the command line, or null if not present
 	/// eg -a "value" or --folder "value"
 	/// </summary>
-	public string? GetParamOpt(params IEnumerable<string> options)
+	public string? GetParamOpt(params ReadOnlySpan<string> options)
 	{
-		ArgumentNullException.ThrowIfNull(options);
 		ValidatePossibleParams(options);
 		CheckFinished();
 
@@ -115,14 +112,24 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Internal version of GetParamOpt, which does not check for valid options
 	/// </summary>
-	private string? GetParamInternal(IEnumerable<string> options)
+	private string? GetParamInternal(ReadOnlySpan<string> options)
 	{
 		if (args.Count == 0) {
 			return null;
 		}
 
-		// do we have this switch on command line?
-		var index = args.FindIndex(a => options.Contains(a.Key));
+		// do we have this switch on command line? Can't use a lambda because options is ref struct
+		var optionArray = options.ToArray();
+		var index = args.FindIndex(a => optionArray.Contains(a.Key));
+
+		//var index = -1;
+		//foreach (var a in args) {
+		//	index = options.IndexOf(a.Key);
+		//	if (index >= 0) {
+		//		break;
+		//	}
+		//}
+
 		if (index == -1) {
 			return null;
 		}
@@ -215,7 +222,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Check options are valid for Contains() or GetParam(), eg -a or --action, but not -aa (already expanded) or ---action or --a
 	/// </summary>
-	private static void ValidatePossibleParams(IEnumerable<string> options)
+	private static void ValidatePossibleParams(ReadOnlySpan<string> options)
 	{
 		var empty = true;
 
