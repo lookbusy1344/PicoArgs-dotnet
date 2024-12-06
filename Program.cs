@@ -22,17 +22,17 @@ internal static class Program
 
 			// parse the rest of the command line
 			var raw = pico.Contains("-r", "--raw");
-			var fast = pico.Contains("-f", "--fast");
+			var fast = pico.Contains(["-f", "--fast"]); // using collection expression to directly create a span. Less allocation
 			var slow = pico.Contains("-s", "--slow");
 
-			var files = pico.GetMultipleParams("-i", "--file").ToArray();
+			var files = pico.GetMultipleParams("-i", "--file");
 			var exclude = pico.GetParamOpt("-e", "--exclude") ?? "example-exclude";
 
 			// we have finished, make sure there are no unused arguments
 			pico.Finished();
 
 			// show the results
-			if (files.Length == 0) {
+			if (files.Count == 0) {
 				Console.WriteLine(HelpMessage);
 				Console.WriteLine("\r\nNo files specified");
 				return;
