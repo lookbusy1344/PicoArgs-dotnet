@@ -16,7 +16,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Supports multiple values for options `-f file1 -f file2`
 - Tiny API, a couple of hundred lines of code
 - Unit tests included
-- Supports .NET 8 with legacy .NET 7 code at [7bb0f2c61306ef53d583f](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/7bb0f2c61306ef53d583f77232e3cab49fd151ec)
+- Supports .NET 9 (main branch) and .NET 8 (dotnet8 branch) with legacy .NET 7 code at [7bb0f2c61306ef53d583f](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/7bb0f2c61306ef53d583f77232e3cab49fd151ec)
 
 Some intentional limitations:
 
@@ -32,7 +32,7 @@ No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code
 var pico = new PicoArgs(args); // construct with command line arguments string[]
 
 bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
-string[] files = pico.GetMultipleParams("-f", "--file").ToArray(); // string[] with zero length if none found
+IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file"); // zero length if none found
 string filename = pico.GetParam("-f", "--file"); // throws if not specified
 string exclude = pico.GetParamOpt("-e", "--exclude") ?? "default"; // specifying a default
 
@@ -84,6 +84,67 @@ private static ConfigOptions ParseConfig(string[] args)
     return new ConfigOptions(instance, database, singleThread);
 }
 ```
+
+## .NET 9 improvements with ReadOnlySpan
+
+In .NET 9 the API has been updated to use `params ReadOnlySpan<string> options` instead of `params string[] options`. Since possible command line options are almost always constant, this allows great optimization by using stack-allocated inline arrays of strings, instead of heap-allocated arrays. The generated code then looks something like this:
+
+```csharp
+// .NET 9 VERSION
+
+// As-written code:
+bool raw = pico.Contains("-r", "--raw");
+
+// ===========================================================
+// Desugared code (simplified):
+
+// elsewhere - define inline array of 2 strings
+[System.Runtime.CompilerServices.InlineArray(2)]
+struct InlineArray
+{
+	private string _element0;
+}
+
+// create the buffer on the stack
+InlineArray buffer;
+
+// populate the buffer with "-r" and "--raw"
+buffer[0] = "-r";
+buffer[1] = "--raw";
+
+// call Contains() method and pass inline array as a ReadOnlySpan
+bool raw = pico.Contains(buffer);
+
+// Note, no array to garbage collect. Just cleaned up with the stack frame.
+```
+
+Before .NET 9, the code would have looked like this:
+
+```csharp
+// .NET 8 VERSION
+
+// Same as-written code:
+bool raw = pico.Contains("-r", "--raw");
+
+// ===========================================================
+// Desugared code:
+
+// heap-allocate an array
+string[] array = new string[2];
+
+// populate the array with "-r" and "--raw"
+array[0] = "-r";
+array[1] = "--raw";
+
+// call Contains() method and pass the array
+bool raw = pico.Contains(array);
+
+// array now requires garbage collection
+```
+
+This looks shorter but its less efficient because of the additional heap allocation.
+
+See https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-9/#span-span-and-more-span for more information.
 
 ## Tests
 
