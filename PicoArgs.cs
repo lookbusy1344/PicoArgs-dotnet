@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 2.0.1 - 04 Oct 2024
+    Version 3.0.1 - 04 Dec 2024
 
     Example usage:
 
@@ -13,7 +13,7 @@ namespace PicoArgs_dotnet;
 	string? patternOpt = pico.GetParamOpt("-t", "--pattern");  // optional parameter
 	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";  // optional parameter with default
 	string requirePath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
-	string[] files = pico.GetMultipleParams("-f", "--file").ToArray();  // yield multiple parameters, converting to an array
+	IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file");  // get multiple parameters eg -f file1 -f file2
 	string command = pico.GetCommand();  // first parameter, throws if not present
 	string? commandOpt = pico.GetCommandOpt();  // first parameter, null if not present
 
@@ -35,10 +35,20 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private readonly List<KeyValue> args = ProcessItems(args, recogniseEquals).ToList();
 	private bool finished;
 
+	// ========= These methods wrap the ReadOnlySpan versions and provide a 'params string[]' interface for .NET 8 =========
+	// ========= They are not needed for .NET 9 or later =========
+
+	public bool Contains(params string[] options) => Contains(options.AsSpan());
+	public IReadOnlyList<string> GetMultipleParams(params string[] options) => GetMultipleParams(options.AsSpan());
+	public string GetParam(params string[] options) => GetParam(options.AsSpan());
+	public string? GetParamOpt(params string[] options) => GetParamOpt(options.AsSpan());
+
+	// ========= End of .NET 8 compatibility methods =========
+
 	/// <summary>
 	/// Get a boolean value from the command line, returns TRUE if found
 	/// </summary>
-	public bool Contains(params string[] options)
+	public bool Contains(ReadOnlySpan<string> options)
 	{
 		ValidatePossibleParams(options);
 		CheckFinished();
@@ -53,7 +63,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			if (index >= 0) {
 				// if this argument has a value, throw eg "--verbose=true" when we just expected "--verbose"
 				if (args[index].Value != null) {
-					throw new PicoArgsException(80, $"Unexpected value for \"{string.Join(", ", options)}\"");
+					throw new PicoArgsException(80, $"Unexpected value for \"{string.Join(", ", options.ToArray())}\"");
 				}
 
 				// found switch so consume it and return
@@ -67,35 +77,38 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Get multiple parameters from the command line, or empty array if not present
+	/// Get multiple parameters from the command line, or empty list if not present
 	/// eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
-	public IEnumerable<string> GetMultipleParams(params string[] options)
+	public IReadOnlyList<string> GetMultipleParams(ReadOnlySpan<string> options)
 	{
 		ValidatePossibleParams(options);
 		CheckFinished();
 
+		var result = new List<string>(4);
 		while (true) {
 			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
 			if (s == null) {
 				break;   // nothing else found, break out of loop
+			} else {
+				result.Add(s);
 			}
-
-			yield return s;
 		}
+
+		return result;
 	}
 
 	/// <summary>
 	/// Get a string value from the command line, throws is not present
 	/// eg -a "value" or --folder "value"
 	/// </summary>
-	public string GetParam(params string[] options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options)}\"");
+	public string GetParam(ReadOnlySpan<string> options) => GetParamOpt(options) ?? throw new PicoArgsException(10, $"Expected value for \"{string.Join(", ", options.ToArray())}\"");
 
 	/// <summary>
 	/// Get a string value from the command line, or null if not present
 	/// eg -a "value" or --folder "value"
 	/// </summary>
-	public string? GetParamOpt(params string[] options)
+	public string? GetParamOpt(ReadOnlySpan<string> options)
 	{
 		ValidatePossibleParams(options);
 		CheckFinished();
@@ -106,15 +119,20 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Internal version of GetParamOpt, which does not check for valid options
 	/// </summary>
-	private string? GetParamInternal(string[] options)
+	private string? GetParamInternal(ReadOnlySpan<string> options)
 	{
-		if (args.Count == 0) {
-			return null;
+		// does args contain any of the specified options? Can't use a lambda because of ref struct
+		var index = -1;
+		for (var i = 0; i < args.Count; ++i) {
+			if (options.Contains(args[i].Key)) {
+				// options contains this key, so we have a match. Record the index and break
+				index = i;
+				break;
+			}
 		}
 
-		// do we have this switch on command line?
-		var index = args.FindIndex(a => options.Contains(a.Key));
 		if (index == -1) {
+			// not found
 			return null;
 		}
 
@@ -206,9 +224,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Check options are valid for Contains() or GetParam(), eg -a or --action, but not -aa (already expanded) or ---action or --a
 	/// </summary>
-	private static void ValidatePossibleParams(string[] options)
+	private static void ValidatePossibleParams(ReadOnlySpan<string> options)
 	{
-		if (options == null || options.Length == 0) {
+		if (options.IsEmpty) {
 			throw new ArgumentException("Must specify at least one option", nameof(options));
 		}
 

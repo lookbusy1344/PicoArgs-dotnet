@@ -70,8 +70,7 @@ internal static partial class Helpers
 	/// <summary>
 	/// Compare the lengths, and sort and compare the arrays
 	/// </summary>
-	public static bool CompareNames(string[] a, string[] b)
-		=> a.Length == b.Length
-			&& a.OrderBy(s => s)
-				.SequenceEqual(b.OrderBy(s => s));
+	public static bool CompareNames(string[] a, IReadOnlyList<string> b)
+		=> a.Length == b.Count
+			&& a.Order().SequenceEqual(b.Order());
 }
