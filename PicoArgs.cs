@@ -1,9 +1,9 @@
-namespace PicoArgs_dotnet;
+﻿namespace PicoArgs_dotnet;
 
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.0.1 - 04 Dec 2024
+    Version 3.0.2 - 06 Dec 2024
 
     Example usage:
 
