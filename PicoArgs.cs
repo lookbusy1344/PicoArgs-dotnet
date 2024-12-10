@@ -293,12 +293,12 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	{
 		var equalsPos = arg.IndexOf('=');
 
-		if (arg.Length > 2 && equalsPos > -1 && arg.StartsWith('-')) {
+		if (arg.Length > 2 && equalsPos > -1 && arg[0] == '-') {
 			// only consider the part before the equals eg "-abc=value" -> "-abc"
 			arg = arg[..equalsPos];
 		}
 
-		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
+		if (arg.Length > 2 && arg[0] == '-' && arg[1] != '-') {
 			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
 			// we have length-1 items eg "-abc" has 3 switches
 			return arg.Length - 1;
