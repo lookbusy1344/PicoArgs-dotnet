@@ -281,11 +281,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static int CountCombinedSwitches(ReadOnlySpan<char> arg)
 	{
-		var equals = arg.IndexOf('=');
+		var equalsPos = arg.IndexOf('=');
 
-		if (arg.Length > 2 && equals > -1 && arg.StartsWith('-')) {
+		if (arg.Length > 2 && equalsPos > -1 && arg.StartsWith('-')) {
 			// only consider the part before the equals eg "-abc=value" -> "-abc"
-			arg = arg[..equals];
+			arg = arg[..equalsPos];
 		}
 
 		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
@@ -301,7 +301,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Validate this input param from command line. Invalid is ---something or --x. Valid options are -a or -ab or --action
 	/// </summary>
-	private static void ValidateInputParam(string arg)
+	private static void ValidateInputParam(ReadOnlySpan<char> arg)
 	{
 		if (arg == "-") {
 			// a single dash is not valid
