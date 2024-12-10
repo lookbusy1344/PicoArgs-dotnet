@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.0.2 - 06 Dec 2024
+    Version 3.0.3 - 10 Dec 2024
 
     Example usage:
 
@@ -277,24 +277,21 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 	/// <summary>
 	/// Check if combined switches eg -abc. Returns the number of combined switches eg 3. This always respects '=' because its handled elsewhere
+	/// Uses a span to avoid allocations
 	/// </summary>
-	private static int CountCombinedSwitches(string arg)
+	private static int CountCombinedSwitches(ReadOnlySpan<char> arg)
 	{
 		var equals = arg.IndexOf('=');
-		ReadOnlySpan<char> span;
 
 		if (arg.Length > 2 && equals > -1 && arg.StartsWith('-')) {
 			// only consider the part before the equals eg "-abc=value" -> "-abc"
-			span = arg.AsSpan(0, equals);
-		} else {
-			// take the whole string
-			span = arg.AsSpan();
+			arg = arg[..equals];
 		}
 
-		if (span.Length > 2 && span.StartsWith('-') && span[1] != '-') {
+		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
 			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
 			// we have length-1 items eg "-abc" has 3 switches
-			return span.Length - 1;
+			return arg.Length - 1;
 		} else {
 			// just a standard single-switch
 			return 1;
