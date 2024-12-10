@@ -281,15 +281,20 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private static int CountCombinedSwitches(string arg)
 	{
 		var equals = arg.IndexOf('=');
+		ReadOnlySpan<char> span;
+
 		if (arg.Length > 2 && equals > -1 && arg.StartsWith('-')) {
 			// only consider the part before the equals eg "-abc=value" -> "-abc"
-			arg = arg[..equals];
+			span = arg.AsSpan(0, equals);
+		} else {
+			// take the whole string
+			span = arg.AsSpan();
 		}
 
-		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
+		if (span.Length > 2 && span.StartsWith('-') && span[1] != '-') {
 			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
 			// we have length-1 items eg "-abc" has 3 switches
-			return arg.Length - 1;
+			return span.Length - 1;
 		} else {
 			// just a standard single-switch
 			return 1;
