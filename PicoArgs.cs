@@ -280,9 +280,10 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static int CountCombinedSwitches(string arg)
 	{
-		if (arg.Length > 2 && arg.StartsWith('-')) {
+		var equals = arg.IndexOf('=');
+		if (arg.Length > 2 && equals > -1 && arg.StartsWith('-')) {
 			// only consider the part before the equals eg "-abc=value" -> "-abc"
-			arg = arg.Split('=', 2)[0];
+			arg = arg[..equals];
 		}
 
 		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
