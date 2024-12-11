@@ -405,4 +405,21 @@ public class PicoTests
 			var fail = SplitArgs.BuildFromSingleString("-x ---another");
 		}, "Should not parse ---another", 90);
 	}
+
+	[Fact(DisplayName = "Equals with no dash")]
+	public void EqualsNoDash()
+	{
+		// "hello=world" without a dash should not be split on the equals, eg key="hello=world" value=null
+
+		var pico = SplitArgs.BuildFromSingleString("hello=world");
+
+		var kv = Assert.Single(pico.UnconsumedArgs);
+		Assert.Equal("hello=world", kv.Key);
+		Assert.Null(kv.Value);
+
+		var cmd = pico.GetCommand();
+		Assert.Equal("hello=world", cmd);
+
+		pico.Finished();
+	}
 }
