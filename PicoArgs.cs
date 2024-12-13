@@ -385,10 +385,11 @@ public readonly record struct KeyValue(string Key, string? Value)
 		var doubleQuote = IndexOf(arg, '\"') ?? int.MaxValue;
 		var eq = IndexOf(arg, '=');
 
-		if (eq < singleQuote && eq < doubleQuote) {
+		if (eq.HasValue && eq < singleQuote && eq < doubleQuote) {
 			// if the equals is before the quotes, then split on the equals
-			var parts = arg.Split('=', 2);
-			return new KeyValue(parts[0], TrimQuote(parts[1]));
+			var key = arg.AsSpan(..eq.Value);
+			var value = arg.AsSpan(eq.Value + 1);
+			return new KeyValue(key.ToString(), TrimQuote(value).ToString());
 		} else {
 			return new KeyValue(arg, null);
 		}
@@ -402,7 +403,7 @@ public readonly record struct KeyValue(string Key, string? Value)
 	/// <summary>
 	/// If the string starts and ends with the same quote, remove them eg "hello world" -> hello world
 	/// </summary>
-	private static string TrimQuote(string str) =>
+	private static ReadOnlySpan<char> TrimQuote(ReadOnlySpan<char> str) =>
 		(str.Length > 1 && (str[0] is '\'' or '\"') && str[^1] == str[0]) ? str[1..^1] : str;
 
 	public override string ToString() => Value == null ? Key : $"{Key}={Value}";
