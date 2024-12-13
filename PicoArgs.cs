@@ -276,7 +276,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Helper when there are multiple switches with equals eg "-abc=code" -> "-a", "-b", "-c=code"
 	/// </summary>
-	private static IEnumerable<KeyValue> ProcessCombinedSwitchesWithEquals(string arg, int countSwitches, bool recogniseEquals)
+	private static IEnumerable<KeyValue> ProcessCombinedSwitchesWithEquals(string arg, uint countSwitches, bool recogniseEquals)
 	{
 		// first process all but the last, eg -a -b but not -c=code
 		for (var c = 1; c < countSwitches; ++c) {
@@ -284,7 +284,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		}
 
 		// finally yield the final param with equals eg "-c=code" or "-c='code'"
-		yield return KeyValue.Build($"-{arg[countSwitches..]}", recogniseEquals);
+		yield return KeyValue.Build($"-{arg[(int)countSwitches..]}", recogniseEquals);
 	}
 
 	/// <summary>
@@ -302,10 +302,10 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// Check if combined switches eg -abc. Returns the number of combined switches eg 3. This always respects '=' because its handled elsewhere
 	/// Uses a span to avoid allocations
 	/// </summary>
-	private static int CountCombinedSwitches(ReadOnlySpan<char> arg)
+	private static uint CountCombinedSwitches(ReadOnlySpan<char> arg)
 	{
 		// ensure this is a switch
-		if (!arg.StartsWith('-')) { return 0; }
+		if (!arg.StartsWith('-')) { return 0u; }
 
 		// otherwise, we have a switch eg "-a", "-abc" or "-abc=code" or "--print"
 		var equalsPos = arg.IndexOf('=');
@@ -318,10 +318,10 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		if (arg.Length > 2 && arg[1] != '-') {
 			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
 			// we have length-1 items eg "-abc" has 3 switches
-			return arg.Length - 1;
+			return (uint)arg.Length - 1u;
 		} else {
 			// just a standard single-switch
-			return 1;
+			return 1u;
 		}
 	}
 
