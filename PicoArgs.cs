@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.0.3 - 10 Dec 2024
+    Version 3.1.0 - 13 Dec 2024
 
     Example usage:
 
@@ -249,28 +249,36 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		foreach (var arg in args) {
 			ValidateInputParam(arg);
 
-			var switches = CountCombinedSwitches(arg);
-			if (switches > 1) {
-				// split combined switches into individual switches eg "-abc" -> "-a" "-b" "-c"
+			var countSwitches = CountCombinedSwitches(arg);
 
-				if (arg.Contains('=')) {
-					// combined switches, with equals eg "-abc=code"
-					// first process all but the last, eg -a -b but not -c=code
-					for (var c = 1; c < switches; ++c) {
-						yield return KeyValue.Build($"-{arg[c]}", false);
-					}
+			switch (countSwitches) {
+				case 0:
+					// not a switch, just a value, eg "action". Never recognised an equals
+					yield return KeyValue.Build(arg, false);
+					break;
+				case 1:
+					// just a single item eg "-a" or "--key=value", but not "-abc"
+					yield return KeyValue.Build(arg, recogniseEquals);
+					break;
+				default:
+					// combined switches, with or without equals eg "-abc" or "-abc=code"
+					// split combined switches into individual switches eg "-abc" -> "-a" "-b" "-c"
+					if (arg.Contains('=')) {
+						// combined switches, with equals eg "-abc=code"
+						// first process all but the last, eg -a -b but not -c=code
+						for (var c = 1; c < countSwitches; ++c) {
+							yield return KeyValue.Build($"-{arg[c]}", false);
+						}
 
-					// finally yield the final param with equals eg "-c=code" or "-c='code'"
-					yield return KeyValue.Build($"-{arg[switches..]}", recogniseEquals);
-				} else {
-					// multiple switches, no equals eg "-abc"
-					foreach (var c in arg[1..]) {
-						yield return KeyValue.Build($"-{c}", false);
+						// finally yield the final param with equals eg "-c=code" or "-c='code'"
+						yield return KeyValue.Build($"-{arg[countSwitches..]}", recogniseEquals);
+					} else {
+						// multiple switches, no equals eg "-abc"
+						foreach (var c in arg[1..]) {
+							yield return KeyValue.Build($"-{c}", false);
+						}
 					}
-				}
-			} else {
-				// just a single item eg "-a" or "--key=value" or "action"
-				yield return KeyValue.Build(arg, recogniseEquals);
+					break;
 			}
 		}
 	}
@@ -281,14 +289,18 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static int CountCombinedSwitches(ReadOnlySpan<char> arg)
 	{
+		// ensure this is a switch
+		if (!arg.StartsWith('-')) { return 0; }
+
+		// otherwise, we have a switch eg "-a", "-abc" or "-abc=code" or "--print"
 		var equalsPos = arg.IndexOf('=');
 
-		if (arg.Length > 2 && equalsPos > -1 && arg.StartsWith('-')) {
+		if (arg.Length > 2 && equalsPos > -1) {
 			// only consider the part before the equals eg "-abc=value" -> "-abc"
 			arg = arg[..equalsPos];
 		}
 
-		if (arg.Length > 2 && arg.StartsWith('-') && arg[1] != '-') {
+		if (arg.Length > 2 && arg[1] != '-') {
 			// if it starts with a dash, and is longer than 2 characters, and the second character is not a dash
 			// we have length-1 items eg "-abc" has 3 switches
 			return arg.Length - 1;
