@@ -251,35 +251,43 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 			var countSwitches = CountCombinedSwitches(arg);
 
-			switch (countSwitches) {
-				case 0:
-					// not a switch, just a value, eg "action". Never recognised an equals
-					yield return KeyValue.Build(arg, false);
-					break;
-				case 1:
-					// just a single item eg "-a" or "--key=value", but not "-abc"
-					yield return KeyValue.Build(arg, recogniseEquals);
-					break;
-				default:
-					// combined switches, with or without equals eg "-abc" or "-abc=code"
-					// split combined switches into individual switches eg "-abc" -> "-a" "-b" "-c"
-					if (arg.Contains('=')) {
-						// combined switches, with equals eg "-abc=code"
-						// first process all but the last, eg -a -b but not -c=code
-						for (var c = 1; c < countSwitches; ++c) {
-							yield return KeyValue.Build($"-{arg[c]}", false);
-						}
+			// turn this (possible combined) item into an enumerable of KeyValue items
+			var items = countSwitches switch {
+				0 => [KeyValue.Build(arg, false)], // not a switch, just a value, eg "action". Never recognized an equals
+				1 => [KeyValue.Build(arg, recogniseEquals)], // just a single item eg "-a" or "--key=value", but not "-abc"
+				_ when arg.Contains('=') => ProcessCombinedSwitchesWithEquals(arg, countSwitches, recogniseEquals), // combined switches with equals eg "-abc=code"
+				_ => ProcessCombinedSwitchesNoEquals(arg) // combined switches, no equals eg "-abc"
+			};
 
-						// finally yield the final param with equals eg "-c=code" or "-c='code'"
-						yield return KeyValue.Build($"-{arg[countSwitches..]}", recogniseEquals);
-					} else {
-						// multiple switches, no equals eg "-abc"
-						foreach (var c in arg[1..]) {
-							yield return KeyValue.Build($"-{c}", false);
-						}
-					}
-					break;
+			// yield each item
+			foreach (var item in items) {
+				yield return item;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Helper when there are multiple switches with equals eg "-abc=code" -> "-a", "-b", "-c=code"
+	/// </summary>
+	private static IEnumerable<KeyValue> ProcessCombinedSwitchesWithEquals(string arg, int countSwitches, bool recogniseEquals)
+	{
+		// first process all but the last, eg -a -b but not -c=code
+		for (var c = 1; c < countSwitches; ++c) {
+			yield return KeyValue.Build($"-{arg[c]}", false);
+		}
+
+		// finally yield the final param with equals eg "-c=code" or "-c='code'"
+		yield return KeyValue.Build($"-{arg[countSwitches..]}", recogniseEquals);
+	}
+
+	/// <summary>
+	/// Helper when there are multiple switches no equals eg "-abc" -> "-a", "-b", "-c"
+	/// </summary>
+	private static IEnumerable<KeyValue> ProcessCombinedSwitchesNoEquals(string arg)
+	{
+		// multiple switches, no equals eg "-abc"
+		foreach (var c in arg[1..]) {
+			yield return KeyValue.Build($"-{c}", false);
 		}
 	}
 
