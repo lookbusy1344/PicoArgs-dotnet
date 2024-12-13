@@ -371,21 +371,22 @@ public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseE
 /// </summary>
 public readonly record struct KeyValue(string Key, string? Value)
 {
-	/// <summary>
-	/// Construct a KeyValue from a ReadOnlySpans
-	/// </summary>
 	public KeyValue(ReadOnlySpan<char> key, ReadOnlySpan<char> value) : this(key.ToString(), value.IsEmpty ? null : value.ToString()) { }
+
+	public KeyValue(ReadOnlySpan<char> key) : this(key.ToString(), null) { }
 
 	/// <summary>
 	/// Build a KeyValue from a string, optionally recognising an equals sign and quotes eg --key=value or --key="value"
 	/// </summary>
-	public static KeyValue Build(string arg, bool recogniseEquals)
+	public static KeyValue Build(ReadOnlySpan<char> arg, bool recogniseEquals)
 	{
-		ArgumentNullException.ThrowIfNull(arg);
+		if (arg.IsEmpty) {
+			throw new ArgumentException("Cannot build KeyValue from empty string", nameof(arg));
+		}
 
 		// if arg does not start with a dash, this cannot be a key+value eg --key=value vs key=value
 		if (!recogniseEquals || !arg.StartsWith('-')) {
-			return new KeyValue(arg, null);
+			return new KeyValue(arg);
 		}
 
 		// locate positions of quotes and equals
@@ -395,14 +396,12 @@ public readonly record struct KeyValue(string Key, string? Value)
 
 		if (eq.HasValue && eq < singleQuote && eq < doubleQuote) {
 			// if the equals is before the quotes, then split on the equals
-			var span = arg.AsSpan();
-
-			var key = span[..eq.Value]; // everything before the equals
-			var value = span[(eq.Value + 1)..]; // everything after the equals, might include quotes
+			var key = arg[..eq.Value]; // everything before the equals
+			var value = arg[(eq.Value + 1)..]; // everything after the equals, might include quotes
 
 			return new KeyValue(key, TrimQuote(value));
 		} else {
-			return new KeyValue(arg, null);
+			return new KeyValue(arg);
 		}
 	}
 
