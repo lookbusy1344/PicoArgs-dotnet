@@ -371,6 +371,14 @@ public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseE
 /// </summary>
 public readonly record struct KeyValue(string Key, string? Value)
 {
+	/// <summary>
+	/// Construct a KeyValue from a ReadOnlySpans
+	/// </summary>
+	public KeyValue(ReadOnlySpan<char> key, ReadOnlySpan<char> value) : this(key.ToString(), value.IsEmpty ? null : value.ToString()) { }
+
+	/// <summary>
+	/// Build a KeyValue from a string, optionally recognising an equals sign and quotes eg --key=value or --key="value"
+	/// </summary>
 	public static KeyValue Build(string arg, bool recogniseEquals)
 	{
 		ArgumentNullException.ThrowIfNull(arg);
@@ -387,9 +395,12 @@ public readonly record struct KeyValue(string Key, string? Value)
 
 		if (eq.HasValue && eq < singleQuote && eq < doubleQuote) {
 			// if the equals is before the quotes, then split on the equals
-			var key = arg.AsSpan(..eq.Value);
-			var value = arg.AsSpan(eq.Value + 1);
-			return new KeyValue(key.ToString(), TrimQuote(value).ToString());
+			var span = arg.AsSpan();
+
+			var key = span[..eq.Value]; // everything before the equals
+			var value = span[(eq.Value + 1)..]; // everything after the equals, might include quotes
+
+			return new KeyValue(key, TrimQuote(value));
 		} else {
 			return new KeyValue(arg, null);
 		}
@@ -398,10 +409,10 @@ public readonly record struct KeyValue(string Key, string? Value)
 	/// <summary>
 	/// Index of a char in a string, or null if not found
 	/// </summary>
-	private static int? IndexOf(string str, char chr) => str.IndexOf(chr) is int pos && pos >= 0 ? pos : null;
+	private static int? IndexOf(ReadOnlySpan<char> str, char chr) => str.IndexOf(chr) is int pos && pos >= 0 ? pos : null;
 
 	/// <summary>
-	/// If the string starts and ends with the same quote, remove them eg "hello world" -> hello world
+	/// If the span starts and ends with the same quote, remove them eg "hello world" -> hello world
 	/// </summary>
 	private static ReadOnlySpan<char> TrimQuote(ReadOnlySpan<char> str) =>
 		(str.Length > 1 && (str[0] is '\'' or '\"') && str[^1] == str[0]) ? str[1..^1] : str;
