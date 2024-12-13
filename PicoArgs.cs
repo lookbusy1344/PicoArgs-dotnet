@@ -251,17 +251,24 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 			var countSwitches = CountCombinedSwitches(arg);
 
-			// turn this (possible combined) item into an enumerable of KeyValue items
-			var items = countSwitches switch {
-				0 => [KeyValue.Build(arg, false)], // not a switch, just a value, eg "action". Never recognized an equals
-				1 => [KeyValue.Build(arg, recogniseEquals)], // just a single item eg "-a" or "--key=value", but not "-abc"
-				_ when arg.Contains('=') => ProcessCombinedSwitchesWithEquals(arg, countSwitches, recogniseEquals), // combined switches with equals eg "-abc=code"
-				_ => ProcessCombinedSwitchesNoEquals(arg) // combined switches, no equals eg "-abc"
-			};
+			switch (countSwitches) {
+				case 0:
+					// not a switch, just a value, eg "action". Never recognized an equals
+					yield return KeyValue.Build(arg, false);
+					break;
 
-			// yield each item
-			foreach (var item in items) {
-				yield return item;
+				case 1:
+					// just a single item eg "-a" or "--key=value", but not "-abc"
+					yield return KeyValue.Build(arg, recogniseEquals);
+					break;
+
+				default:
+					// combined switches that need separating eg "-abc" or "-abc=code"
+					var splitItems = arg.Contains('=') ?
+						ProcessCombinedSwitchesWithEquals(arg, countSwitches, recogniseEquals) : ProcessCombinedSwitchesNoEquals(arg);
+
+					foreach (var item in splitItems) { yield return item; }
+					break;
 			}
 		}
 	}
