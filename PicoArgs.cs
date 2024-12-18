@@ -257,7 +257,6 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 			var equalsPos = arg.IndexOf('=');
 			var switchEnd = equalsPos > -1 ? equalsPos : arg.Length;
-			var valueStart = equalsPos > -1 ? equalsPos + 1 : -1;
 
 			if (switchEnd == 2 || arg[1] == '-') {
 				// single switch or long switch, eg -a or --action
@@ -265,9 +264,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			} else {
 				// combined switches, eg -abc or -abc=code
 				for (var i = 1; i < switchEnd; i++) {
-					if (valueStart > -1 && i == switchEnd - 1) {
-						// last item in the combined switches, and there is a value eg -abc=code -> c=code
-						yield return KeyValue.Build($"-{arg[i]}={arg[valueStart..]}", recogniseEquals);
+					if (equalsPos > -1 && i == switchEnd - 1) {
+						// last item in the combined switches, and there is a value eg -abc=code -> -c=code
+						yield return KeyValue.Build($"-{arg[i]}={arg[(equalsPos + 1)..]}", recogniseEquals);
 					} else {
 						// normal switch eg -abc=code -> -a, -b
 						yield return KeyValue.Build($"-{arg[i]}", false);
