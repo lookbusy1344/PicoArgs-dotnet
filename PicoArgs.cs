@@ -266,22 +266,20 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			}
 
 			var equalsPos = arg.IndexOf('=');
-			var switches = equalsPos > -1 ? arg[..equalsPos] : arg;
+			var switchEnd = equalsPos > -1 ? equalsPos : arg.Length;
 
-			if (switches.Length == 2 || switches[1] == '-') {
+			if (switchEnd == 2 || arg[1] == '-') {
 				// single switch or long switch, eg -a or --action
 				yield return KeyValue.Build(arg, recogniseEquals);
 			} else {
 				// combined switches, eg -abc or -abc=code
-				var value = equalsPos > -1 ? arg[(equalsPos + 1)..] : null;
-
-				for (var i = 1; i < switches.Length; ++i) {
-					if (value != null && i == switches.Length - 1) {
-						// last item in the combined switches, and there is a value eg -abc=code -> c=code
-						yield return KeyValue.Build($"-{switches[i]}={value}", recogniseEquals);
+				for (var i = 1; i < switchEnd; i++) {
+					if (equalsPos > -1 && i == switchEnd - 1) {
+						// last item in the combined switches, and there is a value eg -abc=code -> -c=code
+						yield return KeyValue.Build($"-{arg[i..]}", recogniseEquals);
 					} else {
-						// normal switch eg -abc -> -a, -b, -c
-						yield return KeyValue.Build($"-{switches[i]}", false);
+						// normal switch eg -abc=code -> -a, -b
+						yield return KeyValue.Build($"-{arg[i]}", false);
 					}
 				}
 			}
