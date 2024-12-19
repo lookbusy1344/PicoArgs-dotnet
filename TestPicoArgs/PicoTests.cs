@@ -141,6 +141,40 @@ public class PicoTests
 		Assert.True(pico.IsEmpty);
 	}
 
+	[Fact(DisplayName = "GetCommand single chars")]
+	public void GetCommandSingleChar()
+	{
+		var pico = SplitArgs.BuildFromSingleString("a b c=something -c=code");
+
+		var code = pico.GetParam("-c", "--code");
+		var first = pico.GetCommand();
+		var second = pico.GetCommand();
+		var third = pico.GetCommand();
+		pico.Finished();
+
+		Assert.Equal("code", code);
+		Assert.Equal("a", first);
+		Assert.Equal("b", second);
+		Assert.Equal("c=something", third);
+		Assert.True(pico.IsEmpty);
+	}
+
+	[Fact(DisplayName = "Single and double dash")]
+	public void SingleDashSwitch()
+	{
+		var pico = SplitArgs.BuildFromSingleString("- --hello --");
+
+		var hello = pico.Contains("-h", "--hello");
+		var dash = pico.GetCommand(); // a single dash is not a switch or param, so should be the command
+		var doubledash = pico.GetCommand();
+		pico.Finished();
+
+		Assert.True(hello);
+		Assert.Equal("-", dash);
+		Assert.Equal("--", doubledash);
+		Assert.True(pico.IsEmpty);
+	}
+
 	[Fact(DisplayName = "Missing command")]
 	public void MissingCommand()
 	{

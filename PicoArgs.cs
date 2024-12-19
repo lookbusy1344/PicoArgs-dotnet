@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.1.2 - 18 Dec 2024
+    Version 3.1.3 - 19 Dec 2024
 
     Example usage:
 
@@ -168,9 +168,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			return null;
 		}
 
-		// check for a switch
+		// check for a switch, a single dash '-' or double-dash '--' is ok
 		var cmd = args[0].Key;
-		if (cmd.StartsWith('-')) {
+		if (cmd != "-" && cmd != "--" && cmd.StartsWith('-')) {
 			throw new PicoArgsException(50, $"Expected command not \"{cmd}\"");
 		}
 
