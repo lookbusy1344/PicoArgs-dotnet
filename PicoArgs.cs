@@ -325,10 +325,8 @@ public readonly record struct KeyValue(string Key, string? Value)
 	/// <summary>
 	/// Build a KeyValue from a string, optionally recognising an equals sign and quotes eg --key=value or --key="value"
 	/// </summary>
-	public static KeyValue Build(string arg, bool recogniseEquals)
+	internal static KeyValue Build(string arg, bool recogniseEquals)
 	{
-		ArgumentNullException.ThrowIfNull(arg);
-
 		// if arg does not start with a dash, this cannot be a key+value eg --key=value vs key=value
 		if (!recogniseEquals || !arg.StartsWith('-')) {
 			return new KeyValue(arg, null);
