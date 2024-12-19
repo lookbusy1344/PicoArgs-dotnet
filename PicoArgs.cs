@@ -249,8 +249,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		foreach (var arg in args) {
 			ValidateInputParam(arg);
 
-			if (!arg.StartsWith('-')) {
-				// not a switch
+			if (arg == "-" || !arg.StartsWith('-')) {
+				// not a switch, or just a single dash
 				yield return KeyValue.Build(arg, false);
 				continue;
 			}
