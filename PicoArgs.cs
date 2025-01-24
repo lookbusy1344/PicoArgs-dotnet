@@ -39,7 +39,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	// ========= They are not needed for .NET 9 or later =========
 
 	public bool Contains(params string[] options) => Contains(options.AsSpan());
-	public IReadOnlyList<string> GetMultipleParams(params string[] options) => GetMultipleParams(options.AsSpan());
+	public IList<string> GetMultipleParams(params string[] options) => GetMultipleParams(options.AsSpan());
 	public string GetParam(params string[] options) => GetParam(options.AsSpan());
 	public string? GetParamOpt(params string[] options) => GetParamOpt(options.AsSpan());
 
