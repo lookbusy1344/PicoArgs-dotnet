@@ -1,2 +1,3 @@
 *.yml eol=lf
 *.toml eol=lf
+*.md eol=lf
