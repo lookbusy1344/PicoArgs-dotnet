@@ -4,8 +4,8 @@ on:
   push:
     branches: [ "dotnet8" ]
 
-  pull_request:
-    branches: [ "dotnet8" ]
+#  pull_request:
+#    branches: [ "dotnet8" ]
 
 jobs:
   build:

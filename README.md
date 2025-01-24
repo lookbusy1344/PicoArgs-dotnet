@@ -32,7 +32,7 @@ No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code
 var pico = new PicoArgs(args); // construct with command line arguments string[]
 
 bool raw = pico.Contains("-r", "--raw"); // returns true if either flag is present
-IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file"); // zero length if none found
+IList<string> files = pico.GetMultipleParams("-f", "--file"); // zero length if none found
 string filename = pico.GetParam("-f", "--file"); // throws if not specified
 string exclude = pico.GetParamOpt("-e", "--exclude") ?? "default"; // specifying a default
 
@@ -109,13 +109,14 @@ struct InlineArray
 InlineArray buffer;
 
 // populate the buffer with "-r" and "--raw"
+// strings are on the heap as usual, but the buffer itself is on the stack
 buffer[0] = "-r";
 buffer[1] = "--raw";
 
 // call Contains() method and pass inline array as a ReadOnlySpan
 bool raw = pico.Contains(buffer);
 
-// Note, no array to garbage collect. Just cleaned up with the stack frame.
+// Note, no array to garbage collect. The buffer is cleaned up with the stack frame (the strings require gc as usual)
 ```
 
 Before .NET 9, the code would have looked like this:
@@ -133,13 +134,14 @@ bool raw = pico.Contains("-r", "--raw");
 string[] array = new string[2];
 
 // populate the array with "-r" and "--raw"
+// so there are now 3 heap objects, the array and the 2 strings
 array[0] = "-r";
 array[1] = "--raw";
 
 // call Contains() method and pass the array
 bool raw = pico.Contains(array);
 
-// array now requires garbage collection
+// array now requires garbage collection, as well as the strings it contains
 ```
 
 This looks shorter but its less efficient because of the additional heap allocation.
