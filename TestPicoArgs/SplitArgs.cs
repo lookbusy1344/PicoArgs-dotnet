@@ -159,9 +159,9 @@ internal static partial class SplitArgsImplementation
 				s = ++i < len ? cmdLine[i] : END;
 				if (s == '"') {
 					break;
-				} else {
-					_ = sb.Append(s);
 				}
+
+				_ = sb.Append(s);
 			} while (s != END);
 
 			argv[j++] = sb.ToString();
