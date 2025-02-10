@@ -68,9 +68,9 @@ internal static partial class Helpers
 	}
 
 	/// <summary>
-	/// Compare the lengths, and sort and compare the arrays
+	/// Compare the lengths, and sort and compare the collections
 	/// </summary>
-	public static bool CompareNames(string[] a, IList<string> b)
-		=> a.Length == b.Count
+	public static bool CompareNames(ICollection<string> a, ICollection<string> b)
+		=> a.Count == b.Count
 			&& a.Order().SequenceEqual(b.Order());
 }
