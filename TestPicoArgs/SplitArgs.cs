@@ -1,10 +1,10 @@
 ﻿// #define WIN32_CALLS
 
-using PicoArgs_dotnet;
+namespace TestPicoArgs;
+
 using System.Runtime.InteropServices;
 using System.Text;
-
-namespace TestPicoArgs;
+using PicoArgs_dotnet;
 
 // Borrowed / inspired from
 // https://github.com/fuweichin/Commander.NET/blob/master/Commander.NET/Utils.cs

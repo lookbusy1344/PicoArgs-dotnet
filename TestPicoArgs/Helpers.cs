@@ -1,6 +1,6 @@
-﻿using PicoArgs_dotnet;
+﻿namespace TestPicoArgs;
 
-namespace TestPicoArgs;
+using PicoArgs_dotnet;
 
 internal static partial class Helpers
 {
