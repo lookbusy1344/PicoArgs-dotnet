@@ -1,5 +1,9 @@
 name: PicoArgs compile and test
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   push:
     branches: [ "dotnet8" ]
