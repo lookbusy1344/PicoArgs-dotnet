@@ -20,7 +20,7 @@ internal static partial class Helpers
 	/// <summary>
 	/// Try the action, and assert that it throws the expected PicArgsException and code
 	/// </summary>
-	public static void AssertPicoThrows(Action action, string errMsg, int? code)
+	public static void AssertPicoThrows(Action action, string errMsg, ErrorCode? code)
 	{
 		var result = false; // assume test fails
 
