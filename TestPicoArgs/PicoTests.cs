@@ -57,7 +57,7 @@ public class PicoTests
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
 			var files = pico.GetParam("--something");
-		}, "GetParam() should throw when param missing", PicoArgsErrorCode.MissingRequiredParameter);
+		}, "GetParam() should throw when param missing", ErrorCode.MissingRequiredParameter);
 	}
 
 	[Fact(DisplayName = "Using equals and complex value")]
@@ -122,7 +122,7 @@ public class PicoTests
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
 			pico.Finished();
-		}, "Finished() should throw when parameters are leftover", PicoArgsErrorCode.UnrecognisedParameters);
+		}, "Finished() should throw when parameters are leftover", ErrorCode.UnrecognisedParameters);
 	}
 
 	[Fact(DisplayName = "GetCommand test")]
@@ -189,7 +189,7 @@ public class PicoTests
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
 			_ = pico.GetCommand();
-		}, "GetCommand() should throw when no command present", PicoArgsErrorCode.MissingCommand);
+		}, "GetCommand() should throw when no command present", ErrorCode.MissingCommand);
 	}
 
 	[Fact(DisplayName = "GetCommandOpt test")]
@@ -243,7 +243,7 @@ public class PicoTests
 
 		Helpers.AssertPicoThrows(() => {
 			pico.Dispose();
-		}, "Dispose() should throw when parameters are leftover", PicoArgsErrorCode.UnrecognisedParameters);
+		}, "Dispose() should throw when parameters are leftover", ErrorCode.UnrecognisedParameters);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 	}
 
@@ -262,7 +262,7 @@ public class PicoTests
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
 			var verbose = pico.Contains("-v", "--verbose");
-		}, "Contains() should throw when unwanted switch value is present", PicoArgsErrorCode.UnexpectedValue);
+		}, "Contains() should throw when unwanted switch value is present", ErrorCode.UnexpectedValue);
 	}
 
 	[Fact(DisplayName = "Multiple combined switches")]
@@ -368,11 +368,11 @@ public class PicoTests
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
 			var code = pico.GetParam("-c", "--code");
-		}, "Should not be able to parse c=codename when equals recognition turned off", PicoArgsErrorCode.MissingRequiredParameter);
+		}, "Should not be able to parse c=codename when equals recognition turned off", ErrorCode.MissingRequiredParameter);
 
 		Helpers.AssertPicoThrows(() => {
 			pico.Finished();
-		}, "Since -c was not processed, Finished() should throw", PicoArgsErrorCode.UnrecognisedParameters);
+		}, "Since -c was not processed, Finished() should throw", ErrorCode.UnrecognisedParameters);
 	}
 
 	[Fact(DisplayName = "Invalid params like -something")]
@@ -429,15 +429,15 @@ public class PicoTests
 		// now check some invalid inputs
 		Helpers.AssertPicoThrows(() => {
 			var fail = SplitArgs.BuildFromSingleString("-x --o");
-		}, "Should not parse --o", PicoArgsErrorCode.InvalidParameter);
+		}, "Should not parse --o", ErrorCode.InvalidParameter);
 
 		Helpers.AssertPicoThrows(() => {
 			var fail = SplitArgs.BuildFromSingleString("-x ---o");
-		}, "Should not parse ---o", PicoArgsErrorCode.InvalidParameter);
+		}, "Should not parse ---o", ErrorCode.InvalidParameter);
 
 		Helpers.AssertPicoThrows(() => {
 			var fail = SplitArgs.BuildFromSingleString("-x ---another");
-		}, "Should not parse ---another", PicoArgsErrorCode.InvalidParameter);
+		}, "Should not parse ---another", ErrorCode.InvalidParameter);
 	}
 
 	[Fact(DisplayName = "Equals with no dash")]
