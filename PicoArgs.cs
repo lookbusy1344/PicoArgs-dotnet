@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.3 - 10 Jun 2025
+    Version 3.3.1 - 28 Jun 2025
 
     Example usage:
 
@@ -338,19 +338,19 @@ public readonly record struct KeyValue(string Key, string? Value)
 	internal static KeyValue Build(string arg, bool recogniseEquals)
 	{
 		if (string.IsNullOrEmpty(arg)) {
-			return new KeyValue(string.Empty, null);
+			return new(string.Empty, null);
 		}
 
 		// If not recognizing equals or arg doesn't start with dash, return as-is
 		if (!recogniseEquals || !arg.StartsWith('-')) {
-			return new KeyValue(arg, null);
+			return new(arg, null);
 		}
 
 		var span = arg.AsSpan();
 		var eqIndex = span.IndexOf('=');
 
 		if (eqIndex == -1) {
-			return new KeyValue(arg, null); // No equals sign found
+			return new(arg, null); // No equals sign found
 		}
 
 		// Get key and raw value
@@ -358,7 +358,7 @@ public readonly record struct KeyValue(string Key, string? Value)
 		var valueSpan = span[(eqIndex + 1)..];
 
 		if (valueSpan.IsEmpty) {
-			return new KeyValue(key, string.Empty); // Empty value after equals sign
+			return new(key, string.Empty); // Empty value after equals sign
 		}
 
 		// Check for quoted values
@@ -384,15 +384,15 @@ public readonly record struct KeyValue(string Key, string? Value)
 			if (endQuotePos != -1) {
 				// Extract content inside quotes and unescape any escaped quotes
 				var innerValue = valueSpan[1..endQuotePos].ToString().Replace($"\\{quoteChar}", $"{quoteChar}");
-				return new KeyValue(key, innerValue);
+				return new(key, innerValue);
 			}
 
 			// Unbalanced quotes - treat entire string as value without removing quotes
-			return new KeyValue(key, valueSpan.ToString());
+			return new(key, valueSpan.ToString());
 		}
 
 		// Regular unquoted value
-		return new KeyValue(key, valueSpan.ToString());
+		return new(key, valueSpan.ToString());
 	}
 
 	public override string ToString() => Value == null ? Key : $"{Key}={Value}";
