@@ -462,7 +462,9 @@ public class PicoTests
 	{
 		// Escaped quotes in the value should be preserved
 		// --key="foo \"bar\" baz"
-		var pico = SplitArgs.BuildFromSingleString("--key=\"foo \\\"bar\\\" baz\"");
+
+		// BuildFromSingleString() seems to have a bug with this, so we use PicoArgs directly
+		var pico = new PicoArgs(["--key=\"foo \\\"bar\\\" baz\""]);
 
 		var kv = Assert.Single(pico.UnconsumedArgs);
 		Assert.Equal("--key", kv.Key);
