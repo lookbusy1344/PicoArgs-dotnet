@@ -395,41 +395,6 @@ public readonly record struct KeyValue(string Key, string? Value)
 		return new KeyValue(key, valueSpan.ToString());
 	}
 
-	//internal static KeyValue Build(string arg, bool recogniseEquals)
-	//{
-	//	// if arg does not start with a dash, this cannot be a key+value eg --key=value vs key=value
-	//	if (!recogniseEquals || !arg.StartsWith('-')) {
-	//		return new KeyValue(arg, null);
-	//	}
-
-	//	// locate positions of quotes and equals
-	//	var singleQuote = IndexOf(arg, '\'') ?? int.MaxValue;
-	//	var doubleQuote = IndexOf(arg, '\"') ?? int.MaxValue;
-	//	var eq = IndexOf(arg, '=');
-
-	//	if (eq.HasValue && eq < singleQuote && eq < doubleQuote) {
-	//		// if the equals is before the quotes, then split on the equals, using spans to avoid allocations before trimming
-	//		var span = arg.AsSpan();
-	//		var key = span[..eq.Value]; // everything before the equals
-	//		var value = span[(eq.Value + 1)..]; // everything after the equals, might include quotes
-
-	//		return new KeyValue(key.ToString(), TrimQuote(value).ToString());
-	//	}
-
-	//	return new KeyValue(arg, null);
-	//}
-
-	///// <summary>
-	///// Index of a char in a string, or null if not found
-	///// </summary>
-	//private static int? IndexOf(string str, char chr) => str.IndexOf(chr) is int pos && pos >= 0 ? pos : null;
-
-	///// <summary>
-	///// If the span starts and ends with the same quote, remove them eg "hello world" -> hello world
-	///// </summary>
-	//private static ReadOnlySpan<char> TrimQuote(ReadOnlySpan<char> str) =>
-	//	(str.Length > 1 && (str[0] is '\'' or '\"') && str[^1] == str[0]) ? str[1..^1] : str;
-
 	public override string ToString() => Value == null ? Key : $"{Key}={Value}";
 }
 
