@@ -252,6 +252,10 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
+		if (args is null) {
+			yield break;  // no args, nothing to process
+		}
+
 		foreach (var arg in args) {
 			ValidateInputParam(arg);
 
