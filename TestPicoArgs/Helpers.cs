@@ -29,7 +29,7 @@ internal static partial class Helpers
 		}
 		catch (PicoArgsException ex) {
 			if (code == null) {
-				result = true;  // true if no code specified
+				result = true; // true if no code specified
 			} else {
 				result = ex.Code == code; // true if code matches
 			}
@@ -72,5 +72,5 @@ internal static partial class Helpers
 	/// </summary>
 	public static bool CompareNames(ICollection<string> a, ICollection<string> b)
 		=> a.Count == b.Count
-			&& a.Order().SequenceEqual(b.Order());
+		   && a.Order().SequenceEqual(b.Order());
 }

@@ -16,7 +16,8 @@ internal static class SplitArgs
 	/// <summary>
 	/// Build a PicoArgs from a single command line arguments
 	/// </summary>
-	internal static PicoArgs BuildFromSingleString(string line, bool recogniseEquals = true) => new(SplitArgumentsLine(line), recogniseEquals);
+	internal static PicoArgs BuildFromSingleString(string line, bool recogniseEquals = true) =>
+		new(SplitArgumentsLine(line), recogniseEquals);
 
 	/// <summary>
 	/// Build a PicoArgsDisposable from a single command line arguments
@@ -26,7 +27,8 @@ internal static class SplitArgs
 	/// <summary>
 	/// Split a command line into arguments (adds "echo" to the front to handle the case where the first argument is quoted)
 	/// </summary>
-	private static IEnumerable<string> SplitArgumentsLine(string line) => SplitArgsImplementation.CommandLineToArgvW($"echo {line}").Skip(1);
+	private static IEnumerable<string> SplitArgumentsLine(string line) =>
+		SplitArgsImplementation.CommandLineToArgvW($"echo {line}").Skip(1);
 }
 
 internal static partial class SplitArgsImplementation
@@ -136,6 +138,7 @@ internal static partial class SplitArgsImplementation
 					quoteCount++;
 					s = ++i < len ? cmdLine[i] : END;
 				}
+
 				quoteCount %= 3;
 				if (quoteCount == 2) {
 					quoteCount = 0;
@@ -175,6 +178,7 @@ internal static partial class SplitArgsImplementation
 			argv[j++] = sb.ToString();
 			_ = sb.Clear();
 		}
+
 		while (s is ' ' or '\t') {
 			s = ++i < len ? cmdLine[i] : END;
 		}
@@ -210,6 +214,7 @@ internal static partial class SplitArgsImplementation
 					sb.Length = sb.Length - 1 - (backCount / 2) - 1;
 					_ = sb.Append('"');
 				}
+
 				s = ++i < len ? cmdLine[i] : END;
 				backCount = 0;
 
@@ -222,8 +227,10 @@ internal static partial class SplitArgsImplementation
 						_ = sb.Append('"');
 						quoteCount = 0;
 					}
+
 					s = ++i < len ? cmdLine[i] : END;
 				}
+
 				if (quoteCount == 2) {
 					quoteCount = 0;
 				}
@@ -234,10 +241,12 @@ internal static partial class SplitArgsImplementation
 				backCount = 0;
 			}
 		}
+
 		if (sb.Length > 0) {
 			argv[j++] = sb.ToString();
 			_ = sb.Clear();
 		}
+
 		return argv;
 	}
 #endif

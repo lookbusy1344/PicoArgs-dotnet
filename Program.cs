@@ -6,7 +6,8 @@ internal static class Program
 	{
 		Console.WriteLine("Demo of PicoArgs.cs class, eg:");
 		Console.WriteLine("PicoArgs-dotnet.exe --raw -i file1.txt -i file2.txt --file file3.txt --exclude something");
-		Console.WriteLine("PicoArgs-dotnet.exe --raw -i=file1.txt -i=\"file 2.txt\" --file file3.txt -i=\"-something=else\" --exclude=\"something else\"");
+		Console.WriteLine(
+			"PicoArgs-dotnet.exe --raw -i=file1.txt -i=\"file 2.txt\" --file file3.txt -i=\"-something=else\" --exclude=\"something else\"");
 
 		try {
 			//var pico = new PicoArgs("--raw -f file1.txt -f file2.txt --file file3.txt --exclude something");
@@ -59,7 +60,8 @@ internal static class Program
 	/// Alternative usage to the example in Main() above.
 	/// This wraps the parsing of the command line, and returns the results as a tuple.
 	/// </summary>
-	private static (bool help, DirectoryInfo folder, string pattern, bool verbose) ParseCommandLineWrapper(string[] args)
+	private static (bool help, DirectoryInfo folder, string pattern, bool verbose) ParseCommandLineWrapper(
+		string[] args)
 	{
 		// this will throw when it leaves scope if there are any unused arguments
 		using var pico = new PicoArgsDisposable(args);
@@ -80,12 +82,12 @@ internal static class Program
 	}
 
 	private const string HelpMessage = """
-		Usage: PicoArgs-dotnet.exe [options]
+	                                   Usage: PicoArgs-dotnet.exe [options]
 
-		Options:
-		  -f, --file <filename>     File(s) to search (required)
-		  -e, --exclude <pattern>   Exclude pattern (default 'example-exclude')
-		  -r, --raw                 Raw output
-		  -h, --help, -?            Help information
-		""";
+	                                   Options:
+	                                     -f, --file <filename>     File(s) to search (required)
+	                                     -e, --exclude <pattern>   Exclude pattern (default 'example-exclude')
+	                                     -r, --raw                 Raw output
+	                                     -h, --help, -?            Help information
+	                                   """;
 }

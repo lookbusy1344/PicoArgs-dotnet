@@ -77,7 +77,8 @@ public class PicoTests
 	public void QuotedValues()
 	{
 		string[] expected = ["item1", "item2", "item3", "item 4", "-item 5", "--item=6"];
-		var pico = SplitArgs.BuildFromSingleString("--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\" --file=\"-item 5\" -f=\"--item=6\"");
+		var pico = SplitArgs.BuildFromSingleString(
+			"--file=item1 --file=\"item2\" --file='item3' --file=\"item 4\" --file=\"-item 5\" -f=\"--item=6\"");
 
 		var files = pico.GetMultipleParams("-f", "--file");
 
@@ -200,7 +201,7 @@ public class PicoTests
 		var verbose = pico.Contains("-v", "--verbose");
 		var file = pico.GetParam("-f", "--file");
 		var print = pico.GetCommand();
-		var notFound = pico.GetCommandOpt();    // a command that is not present, so should be null
+		var notFound = pico.GetCommandOpt(); // a command that is not present, so should be null
 		pico.Finished();
 
 		Assert.True(verbose);
@@ -224,8 +225,10 @@ public class PicoTests
 	[Fact(DisplayName = "Key / value splitting in detail")]
 	public void KVCheck()
 	{
-		KeyValue[] expected = [ new("--file", "file1.txt"), new("--print", null),
-			new("something", null), new("--verbose", "yes") ];
+		KeyValue[] expected = [
+			new("--file", "file1.txt"), new("--print", null),
+			new("something", null), new("--verbose", "yes")
+		];
 		var pico = SplitArgs.BuildFromSingleString("--file=file1.txt --print something --verbose=yes");
 
 		var match = expected.SequenceEqual(pico.UnconsumedArgs);
@@ -278,7 +281,7 @@ public class PicoTests
 		var a = pico.Contains("-a");
 		var b = pico.Contains("-b");
 		var c = pico.Contains("-c");
-		var x = pico.Contains("-x");        // not specified
+		var x = pico.Contains("-x"); // not specified
 
 		pico.Finished();
 
@@ -302,7 +305,7 @@ public class PicoTests
 
 		var a = pico.Contains("-a");
 		var b = pico.Contains("-b");
-		var x = pico.Contains("-x");        // not specified
+		var x = pico.Contains("-x"); // not specified
 
 		pico.Finished();
 
@@ -323,7 +326,7 @@ public class PicoTests
 
 		var a = pico.Contains("-a");
 		var b = pico.Contains("-b");
-		var x = pico.Contains("-x");        // not specified
+		var x = pico.Contains("-x"); // not specified
 
 		pico.Finished();
 
@@ -345,7 +348,7 @@ public class PicoTests
 		var a = pico.Contains("-a");
 		var b = pico.Contains("-b");
 		var another = pico.Contains("--another");
-		var x = pico.Contains("-x");        // not specified
+		var x = pico.Contains("-x"); // not specified
 
 		pico.Finished();
 
@@ -367,8 +370,9 @@ public class PicoTests
 
 		// this should throw an exception
 		Helpers.AssertPicoThrows(() => {
-			var code = pico.GetParam("-c", "--code");
-		}, "Should not be able to parse c=codename when equals recognition turned off", ErrorCode.MissingRequiredParameter);
+				var code = pico.GetParam("-c", "--code");
+			}, "Should not be able to parse c=codename when equals recognition turned off",
+			ErrorCode.MissingRequiredParameter);
 
 		Helpers.AssertPicoThrows(() => {
 			pico.Finished();
