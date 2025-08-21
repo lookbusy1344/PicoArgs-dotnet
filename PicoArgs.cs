@@ -1,4 +1,4 @@
-﻿namespace PicoArgs_dotnet;
+namespace PicoArgs_dotnet;
 
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
@@ -92,9 +92,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 		var result = new List<string>(4);
 		while (true) {
-			var s = GetParamInternal(options);  // Internal call, because we have already validated the options
+			var s = GetParamInternal(options); // Internal call, because we have already validated the options
 			if (s == null) {
-				break;   // nothing else found, break out of loop
+				break; // nothing else found, break out of loop
 			}
 
 			result.Add(s);
@@ -159,7 +159,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		// grab and check the next parameter
 		var secondItem = argList[index + 1];
 		if (secondItem.Value != null) {
-			throw new PicoArgsException(ErrorCode.AmbiguousValue, $"Cannot identify value for param \"{item.Key}\", followed by \"{secondItem.Key}\" and \"{secondItem.Value}\"");
+			throw new PicoArgsException(ErrorCode.AmbiguousValue,
+				$"Cannot identify value for param \"{item.Key}\", followed by \"{secondItem.Key}\" and \"{secondItem.Value}\"");
 		}
 
 		// consume the switch and the separate value
@@ -172,7 +173,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// <summary>
 	/// Return and consume the first command line parameter. Throws if not present
 	/// </summary>
-	public string GetCommand() => GetCommandOpt() ?? throw new PicoArgsException(ErrorCode.MissingCommand, "Expected command");
+	public string GetCommand() =>
+		GetCommandOpt() ?? throw new PicoArgsException(ErrorCode.MissingCommand, "Expected command");
 
 	/// <summary>
 	/// Return and consume the first command line parameter. Returns null if not present
@@ -211,7 +213,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	public void Finished()
 	{
 		if (argList.Count > 0) {
-			throw new PicoArgsException(ErrorCode.UnrecognisedParameters, $"Unrecognised parameter(s): {string.Join(", ", argList)}");
+			throw new PicoArgsException(ErrorCode.UnrecognisedParameters,
+				$"Unrecognised parameter(s): {string.Join(", ", argList)}");
 		}
 
 		finished = true;
@@ -238,17 +241,21 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 
 		foreach (var o in options) {
 			if (o.Length == 1 || !o.StartsWith('-')) {
-				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}", nameof(options));
+				throw new ArgumentException($"Options must start with a dash and be longer than 1 character: {o}",
+					nameof(options));
 			}
+
 			if (o.Length > 2) {
 				if (o[1] != '-') {
 					// if it is longer than 2 characters, the second character must be a dash. eg -ab is invalid here (its already been expanded to -a -b)
 					throw new ArgumentException($"Long options must start with 2 dashes: {o}", nameof(options));
 				}
+
 				if (o[2] == '-') {
 					// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
 					throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
 				}
+
 				if (o.Length == 3) {
 					throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
 				}
@@ -263,7 +270,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
 		if (args is null) {
-			yield break;  // no args, nothing to process
+			yield break; // no args, nothing to process
 		}
 
 		foreach (var arg in args) {
@@ -305,13 +312,16 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			// a single dash is not valid
 			throw new PicoArgsException(ErrorCode.InvalidParameter, "Parameter should not be a single dash");
 		}
+
 		if (arg.StartsWith("---")) {
 			// eg ---something is not valid
 			throw new PicoArgsException(ErrorCode.InvalidParameter, $"Parameter should not start with 3 dashes: {arg}");
 		}
+
 		if (arg.Length == 3 && arg.StartsWith("--")) {
 			// eg --a is not valid
-			throw new PicoArgsException(ErrorCode.InvalidParameter, $"Long options must be 2 characters or more: {arg}");
+			throw new PicoArgsException(ErrorCode.InvalidParameter,
+				$"Long options must be 2 characters or more: {arg}");
 		}
 	}
 }
@@ -319,10 +329,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 /// <summary>
 /// Tiny command line argument parser. This version implements IDisposable, and will throw if there are any unused command line parameters
 /// </summary>
-public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseEquals = true) : PicoArgs(args, recogniseEquals), IDisposable
+public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseEquals = true)
+	: PicoArgs(args, recogniseEquals), IDisposable
 {
 	/// <summary>
-	/// If true, supress the check for unused command line parameters
+	/// If true, suppress the check for unused command line parameters
 	/// </summary>
 	public bool SuppressCheck { get; set; }
 
@@ -415,7 +426,7 @@ public class PicoArgsException : Exception
 {
 	public ErrorCode Code { get; init; }
 
-	public PicoArgsException(ErrorCode code, string message) : base(message) => this.Code = code;
+	public PicoArgsException(ErrorCode code, string message) : base(message) => Code = code;
 
 	public PicoArgsException() { }
 
@@ -429,7 +440,7 @@ public class PicoArgsException : Exception
 /// </summary>
 public enum ErrorCode
 {
-	None = 0,  // No error, used for default values
+	None = 0, // No error, used for default values
 	MissingRequiredParameter,
 	MissingValue,
 	AmbiguousValue,
