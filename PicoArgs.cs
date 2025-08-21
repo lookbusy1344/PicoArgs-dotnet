@@ -325,7 +325,7 @@ public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseE
 	: PicoArgs(args, recogniseEquals), IDisposable
 {
 	/// <summary>
-	/// If true, supress the check for unused command line parameters
+	/// If true, suppress the check for unused command line parameters
 	/// </summary>
 	public bool SuppressCheck { get; set; }
 
