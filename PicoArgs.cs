@@ -49,10 +49,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		}
 
 		// use HashSet for faster lookups, just one heap allocation
-		var optionsSet = new HashSet<string>(options.Length);
-		foreach (var o in options) {
-			_ = optionsSet.Add(o);
-		}
+		var optionsSet = options.ToHashSet();
 
 		for (var index = 0; index < argList.Count; ++index) {
 			if (optionsSet.Contains(argList[index].Key)) {
