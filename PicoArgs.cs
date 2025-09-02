@@ -300,10 +300,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static void ValidateInputParam(ReadOnlySpan<char> arg)
 	{
-		if (arg == "-") {
-			// a single dash is not valid
-			throw new PicoArgsException(ErrorCode.InvalidParameter, "Parameter should not be a single dash");
-		}
+		// Single dash "-" is valid and handled in main parsing logic
 
 		if (arg.StartsWith("---")) {
 			// eg ---something is not valid
