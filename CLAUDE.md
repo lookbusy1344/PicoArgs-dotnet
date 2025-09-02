@@ -45,6 +45,7 @@ dotnet test --filter "ClassName"
 - Functional style preferred
 - Concise code sections, minimal unchanged code
 - Brief commit messages (single sentence summary)
+- Unneeded return values should always have explicit discards: `_ = func()`
 
 ### Testing
 - All tests use xUnit framework
