@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
     https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.3.1 - 28 Jun 2025
+    Version 3.4.0 - 02 Sep 2025
 
     Example usage:
 
@@ -51,7 +51,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		// use HashSet for faster lookups, just one heap allocation
 		var optionsSet = new HashSet<string>(options.Length);
 		foreach (var o in options) {
-			_ = optionsSet.Add(o);
+			optionsSet.Add(o);
 		}
 
 		for (var index = 0; index < argList.Count; ++index) {
@@ -59,7 +59,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 				// if this argument has a value, throw
 				if (argList[index].Value != null) {
 					throw new PicoArgsException(ErrorCode.UnexpectedValue,
-						$"Unexpected value for \"{string.Join(", ", options!)}\"");
+						$"Unexpected value for \"{string.Join(", ", optionsSet)}\"");
 				}
 
 				// found switch so consume it and return
@@ -285,7 +285,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 				for (var i = 1; i < switchEnd; i++) {
 					if (equalsPos > -1 && i == switchEnd - 1) {
 						// last item in the combined switches, and there is a value eg -abc=code -> -c=code
-						yield return KeyValue.Build($"-{arg[i..]}", recogniseEquals);
+						yield return KeyValue.Build($"-{arg[i..switchEnd]}={arg[(equalsPos + 1)..]}", recogniseEquals);
 					} else {
 						// normal switch eg -abc=code -> -a, -b
 						yield return KeyValue.Build($"-{arg[i]}", false);
@@ -300,10 +300,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static void ValidateInputParam(ReadOnlySpan<char> arg)
 	{
-		if (arg == "-") {
-			// a single dash is not valid
-			throw new PicoArgsException(ErrorCode.InvalidParameter, "Parameter should not be a single dash");
-		}
+		// Single dash "-" is valid and handled in main parsing logic
 
 		if (arg.StartsWith("---")) {
 			// eg ---something is not valid
