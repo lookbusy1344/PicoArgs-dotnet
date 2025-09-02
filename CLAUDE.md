@@ -23,6 +23,7 @@ Key architectural concepts:
 dotnet restore
 dotnet build --configuration Debug --no-restore
 dotnet test --no-restore
+dotnet format
 ```
 
 ### Run the demo application
