@@ -55,17 +55,19 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		}
 
 		for (var index = 0; index < argList.Count; ++index) {
-			if (optionsSet.Contains(argList[index].Key)) {
-				// if this argument has a value, throw
-				if (argList[index].Value != null) {
-					throw new PicoArgsException(ErrorCode.UnexpectedValue,
-						$"Unexpected value for \"{string.Join(", ", optionsSet)}\"");
-				}
-
-				// found switch so consume it and return
-				argList.RemoveAt(index);
-				return true;
+			if (!optionsSet.Contains(argList[index].Key)) {
+				continue;
 			}
+
+			// if this argument has a value, throw
+			if (argList[index].Value != null) {
+				throw new PicoArgsException(ErrorCode.UnexpectedValue,
+					$"Unexpected value for \"{string.Join(", ", optionsSet)}\"");
+			}
+
+			// found switch so consume it and return
+			argList.RemoveAt(index);
+			return true;
 		}
 
 		// not found
@@ -122,11 +124,13 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		// does args contain any of the specified options? Can't use a lambda because of ref struct
 		var index = -1;
 		for (var i = 0; i < argList.Count; ++i) {
-			if (options.Contains(argList[i].Key)) {
-				// options contains this key, so we have a match. Record the index and break
-				index = i;
-				break;
+			if (!options.Contains(argList[i].Key)) {
+				continue;
 			}
+
+			// options contains this key, so we have a match. Record the index and break
+			index = i;
+			break;
 		}
 
 		if (index == -1) {
@@ -237,20 +241,22 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 					nameof(options));
 			}
 
-			if (o.Length > 2) {
-				if (o[1] != '-') {
-					// if it is longer than 2 characters, the second character must be a dash. eg -ab is invalid here (its already been expanded to -a -b)
-					throw new ArgumentException($"Long options must start with 2 dashes: {o}", nameof(options));
-				}
+			if (o.Length <= 2) {
+				continue;
+			}
 
-				if (o[2] == '-') {
-					// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
-					throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
-				}
+			if (o[1] != '-') {
+				// if it is longer than 2 characters, the second character must be a dash. eg -ab is invalid here (its already been expanded to -a -b)
+				throw new ArgumentException($"Long options must start with 2 dashes: {o}", nameof(options));
+			}
 
-				if (o.Length == 3) {
-					throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
-				}
+			if (o[2] == '-') {
+				// if it is longer than 2 characters, the third character must not be a dash. eg ---a is not valid
+				throw new ArgumentException($"Options should not start with 3 dashes: {o}", nameof(options));
+			}
+
+			if (o.Length == 3) {
+				throw new ArgumentException($"Long options must be 2 characters or more: {o}", nameof(options));
 			}
 		}
 	}
@@ -372,37 +378,37 @@ public readonly record struct KeyValue(string Key, string? Value)
 		}
 
 		// Check for quoted values
-		if ((valueSpan[0] == '\'' || valueSpan[0] == '\"') && valueSpan.Length > 1) {
-			var quoteChar = valueSpan[0];
-
-			// Find matching end quote (ignoring escaped quotes)
-			var endQuotePos = -1;
-			for (var i = 1; i < valueSpan.Length; i++) {
-				// Skip escaped quotes
-				if (valueSpan[i] == '\\' && i + 1 < valueSpan.Length && valueSpan[i + 1] == quoteChar) {
-					i++;
-					continue;
-				}
-
-				if (valueSpan[i] == quoteChar) {
-					endQuotePos = i;
-					break;
-				}
-			}
-
-			// Found matching quote
-			if (endQuotePos != -1) {
-				// Extract content inside quotes and unescape any escaped quotes
-				var innerValue = valueSpan[1..endQuotePos].ToString().Replace($"\\{quoteChar}", $"{quoteChar}");
-				return new(key, innerValue);
-			}
-
-			// Unbalanced quotes - treat entire string as value without removing quotes
+		if ((valueSpan[0] != '\'' && valueSpan[0] != '\"') || valueSpan.Length <= 1) {
 			return new(key, valueSpan.ToString());
 		}
 
-		// Regular unquoted value
-		return new(key, valueSpan.ToString());
+		var quoteChar = valueSpan[0];
+
+		// Find matching end quote (ignoring escaped quotes)
+		var endQuotePos = -1;
+		for (var i = 1; i < valueSpan.Length; i++) {
+			// Skip escaped quotes
+			if (valueSpan[i] == '\\' && i + 1 < valueSpan.Length && valueSpan[i + 1] == quoteChar) {
+				i++;
+				continue;
+			}
+
+			if (valueSpan[i] != quoteChar) {
+				continue;
+			}
+
+			endQuotePos = i;
+			break;
+		}
+
+		// Found matching quote
+		if (endQuotePos == -1) {
+			return new(key, valueSpan.ToString());
+		}
+
+		// Extract content inside quotes and unescape any escaped quotes
+		var innerValue = valueSpan[1..endQuotePos].ToString().Replace($"\\{quoteChar}", $"{quoteChar}");
+		return new(key, innerValue);
 	}
 
 	public override string ToString() => Value == null ? Key : $"{Key}={Value}";
