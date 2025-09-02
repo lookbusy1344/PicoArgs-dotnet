@@ -282,7 +282,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 				for (var i = 1; i < switchEnd; i++) {
 					if (equalsPos > -1 && i == switchEnd - 1) {
 						// last item in the combined switches, and there is a value eg -abc=code -> -c=code
-						yield return KeyValue.Build($"-{arg[i..]}", recogniseEquals);
+						yield return KeyValue.Build($"-{arg[i..switchEnd]}={arg[(equalsPos + 1)..]}", recogniseEquals);
 					} else {
 						// normal switch eg -abc=code -> -a, -b
 						yield return KeyValue.Build($"-{arg[i]}", false);
