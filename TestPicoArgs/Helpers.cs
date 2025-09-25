@@ -1,4 +1,4 @@
-﻿namespace TestPicoArgs;
+namespace TestPicoArgs;
 
 using PicoArgs_dotnet;
 
