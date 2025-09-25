@@ -1,11 +1,11 @@
 namespace PicoArgs_dotnet;
 
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
-    https://github.com/lookbusy1344/PicoArgs-dotnet
+	https://github.com/lookbusy1344/PicoArgs-dotnet
 
-    Version 3.4.0 - 02 Sep 2025
+	Version 3.4.1 - 25 Sep 2025
 
-    Example usage:
+	Example usage:
 
 	var pico = new PicoArgs(args);
 
@@ -20,7 +20,7 @@ namespace PicoArgs_dotnet;
 	pico.Finished();  // We are done. Throw if there are any unused parameters
 
 
-    INSPIRED BY PICO-ARGS FOR RUST: https://github.com/RazrFalcon/pico-args
+	INSPIRED BY PICO-ARGS FOR RUST: https://github.com/RazrFalcon/pico-args
 
 */
 
