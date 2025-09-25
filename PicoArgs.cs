@@ -57,7 +57,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			// if this argument has a value, throw
 			if (argList[index].Value != null) {
 				throw new PicoArgsException(ErrorCode.UnexpectedValue,
-					$"Unexpected value for \"{string.Join(", ", options)}\"");
+					$"Unexpected value for \"{string.Join(", ", options!)}\"");
 			}
 
 			// found switch so consume it and return
