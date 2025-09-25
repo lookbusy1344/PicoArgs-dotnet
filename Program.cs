@@ -1,4 +1,4 @@
-﻿namespace PicoArgs_dotnet;
+namespace PicoArgs_dotnet;
 
 internal static class Program
 {

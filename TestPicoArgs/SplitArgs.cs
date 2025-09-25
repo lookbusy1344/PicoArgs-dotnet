@@ -1,4 +1,4 @@
-﻿// #define WIN32_CALLS
+// #define WIN32_CALLS
 
 namespace TestPicoArgs;
 
