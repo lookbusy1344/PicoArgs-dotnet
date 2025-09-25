@@ -4,3 +4,5 @@ obj/
 *.csproj.user
 .DS_Store
 /PicoArgs-dotnet.sln.DotSettings.user
+copilotDiffState.xml
+copilot.data.*.xml
