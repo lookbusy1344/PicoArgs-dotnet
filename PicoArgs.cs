@@ -48,21 +48,16 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			return false;
 		}
 
-		// use HashSet for faster lookups, just one heap allocation
-		var optionsSet = new HashSet<string>(options.Length);
-		foreach (var o in options) {
-			_ = optionsSet.Add(o);
-		}
-
+		// use linear search for small option counts (typically 1-2 options)
 		for (var index = 0; index < argList.Count; ++index) {
-			if (!optionsSet.Contains(argList[index].Key)) {
+			if (!options.Contains(argList[index].Key)) {
 				continue;
 			}
 
 			// if this argument has a value, throw
 			if (argList[index].Value != null) {
 				throw new PicoArgsException(ErrorCode.UnexpectedValue,
-					$"Unexpected value for \"{string.Join(", ", optionsSet)}\"");
+					$"Unexpected value for \"{string.Join(", ", options)}\"");
 			}
 
 			// found switch so consume it and return
