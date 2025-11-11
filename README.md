@@ -16,7 +16,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Supports multiple values for options `-f file1 -f file2`
 - Tiny API, a couple of hundred lines of code
 - Unit tests included
-- Supports .NET 9 (main branch) and .NET 8 (dotnet8 branch) with legacy .NET 7 code at [7bb0f2c61306ef53d583f](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/7bb0f2c61306ef53d583f77232e3cab49fd151ec)
+- Supports .NET 10 (main branch) and .NET 9 (dotnet9 branch) with unmaintained .NET 8 code at [2cab58d8918364c95070c096a22914d078da65c4](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/2cab58d8918364c95070c096a22914d078da65c4) and .NET 7 code at [7bb0f2c61306ef53d583f](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/7bb0f2c61306ef53d583f77232e3cab49fd151ec)
 
 Some intentional limitations:
 
