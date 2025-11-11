@@ -6,10 +6,10 @@ permissions:
 
 on:
   push:
-    branches: ["main"]
+    branches: ["dotnet9"]
 
 #  pull_request:
-#    branches: [ "main" ]
+#    branches: [ "dotnet8" ]
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: "9.0.x"
 
       - name: Restore dependencies
         run: dotnet restore
