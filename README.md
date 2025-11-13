@@ -12,11 +12,11 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Only one file to add, no dependencies, very compact
 - Supports flags, options and positional arguments
 - Supports equivalent short and long options `-p` alias for `--print`
-- Supports combining short flags, e.g. `-abc` is equivalent to `-a` `-b` `-c` including with a trailing parameter `-abc=code` same as `-a` `-b` `-c code` (new in v1.5)
+- Supports combining short flags, e.g. `-abc` is equivalent to `-a` `-b` `-c` including with a trailing parameter `-abc=code` same as `-a` `-b` `-c code`
 - Supports multiple values for options `-f file1 -f file2`
 - Tiny API, a couple of hundred lines of code
 - Unit tests included
-- Supports .NET 10 (main branch) and .NET 9 (dotnet9 branch) with unmaintained .NET 8 code at [2cab58d8918364c95070c096a22914d078da65c4](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/2cab58d8918364c95070c096a22914d078da65c4) and .NET 7 code at [7bb0f2c61306ef53d583f](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/7bb0f2c61306ef53d583f77232e3cab49fd151ec)
+- Supports .NET 10 (main branch) and .NET 8 & 9 on respective branches. Unmaintained .NET 7 code is at [7bb0f2c61306ef53d583f](https://github.com/lookbusy1344/PicoArgs-dotnet/tree/7bb0f2c61306ef53d583f77232e3cab49fd151ec)
 
 Some intentional limitations:
 
