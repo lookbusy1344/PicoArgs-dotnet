@@ -6,7 +6,7 @@ permissions:
 
 on:
   push:
-    branches: [ "dotnet8" ]
+    branches: ["dotnet8"]
 
 #  pull_request:
 #    branches: [ "dotnet8" ]
@@ -16,18 +16,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --configuration Debug --no-restore
+      - name: Build
+        run: dotnet build --configuration Debug --no-restore
 
-    - name: Test
-      run: dotnet test --no-restore
+      - name: Test
+        run: dotnet test --no-restore
