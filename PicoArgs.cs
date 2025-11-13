@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
 	https://github.com/lookbusy1344/PicoArgs-dotnet
 
-	Version 3.4.1 - 25 Sep 2025
+	Version 3.4.2 - 13 Nov 2025
 
 	Example usage:
 
@@ -57,7 +57,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			// if this argument has a value, throw
 			if (argList[index].Value != null) {
 				throw new PicoArgsException(ErrorCode.UnexpectedValue,
-					$"Unexpected value for \"{string.Join(", ", options!)}\"");
+					$"Unexpected value for \"{string.Join(", ", options)}\"");
 			}
 
 			// found switch so consume it and return
@@ -97,7 +97,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	public string GetParam(params ReadOnlySpan<string> options)
 		=> GetParamOpt(options) ?? throw new PicoArgsException(ErrorCode.MissingRequiredParameter,
-			$"Expected value for \"{string.Join(", ", options!)}\"");
+			$"Expected value for \"{string.Join(", ", options)}\"");
 
 	/// <summary>
 	/// Get a string value from the command line, or null if not present
