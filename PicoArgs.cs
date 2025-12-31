@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
 	https://github.com/lookbusy1344/PicoArgs-dotnet
 
-	Version 3.4.2 - 13 Nov 2025
+	Version 3.5.0 - 31 Dec 2025
 
 	Example usage:
 
@@ -199,6 +199,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	public bool IsEmpty => argList.Count == 0;
 
 	/// <summary>
+	/// Return true if Finished() has been called
+	/// </summary>
+	protected bool IsFinished => finished;
+
+	/// <summary>
 	/// Throw an exception if there are any unused command line parameters
 	/// </summary>
 	public void Finished()
@@ -332,7 +337,7 @@ public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseE
 	/// </summary>
 	public void Dispose()
 	{
-		if (!SuppressCheck) {
+		if (!SuppressCheck && !IsFinished) {
 			Finished();
 		}
 	}
