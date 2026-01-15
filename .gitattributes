@@ -1,4 +1,4 @@
-# 01 Apr 2025
+# 15 Jan 2026 - custom
 # Others, leave as-is (dont treat them as text)
 * -text
 
@@ -16,7 +16,7 @@
 *.go text eol=lf
 *.mod text eol=lf
 
-# Python 
+# Python
 *.py text eol=lf
 *.ipynb text eol=lf
 
@@ -32,11 +32,12 @@
 *.svelte text eol=lf
 *.vue text eol=lf
 
+# .NET settings now standardized
+*.cs text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+
 # Windows line endings
-*.cs text eol=crlf
-# *.csproj text eol=crlf # dependabot issues with line endings?
-# *.csproj.user text eol=crlf
-*.sln text eol=crlf
 *.resx text eol=crlf
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
