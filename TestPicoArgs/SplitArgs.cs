@@ -1,7 +1,9 @@
 // #define WIN32_CALLS
 
+// ReSharper disable RedundantAssignment
 namespace TestPicoArgs;
 
+// ReSharper disable once RedundantUsingDirective
 using System.Runtime.InteropServices;
 using System.Text;
 using PicoArgs_dotnet;
@@ -31,7 +33,7 @@ internal static class SplitArgs
 		SplitArgsImplementation.CommandLineToArgvW($"echo {line}").Skip(1);
 }
 
-internal static partial class SplitArgsImplementation
+internal static class SplitArgsImplementation
 {
 #if WIN32_CALLS
 	/**

@@ -267,10 +267,6 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	/// </summary>
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
-		if (args is null) {
-			yield break; // no args, nothing to process
-		}
-
 		foreach (var arg in args) {
 			ValidateInputParam(arg);
 
@@ -330,6 +326,7 @@ public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseE
 	/// <summary>
 	/// If true, suppress the check for unused command line parameters
 	/// </summary>
+	// ReSharper disable once UnusedAutoPropertyAccessor.Global
 	public bool SuppressCheck { get; set; }
 
 	/// <summary>
