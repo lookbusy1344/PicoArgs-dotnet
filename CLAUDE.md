@@ -36,6 +36,10 @@ dotnet test --filter "TestMethodName"
 dotnet test --filter "ClassName"
 ```
 
+## Committing
+
+Before every commit, run the `/pre-commit` skill.
+
 ## Development Guidelines
 
 ### Code Style
