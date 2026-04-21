@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Structure
 
 PicoArgs-dotnet is a single-file command line argument parser library for .NET, inspired by the Rust pico-args library. The project consists of:
@@ -41,16 +39,9 @@ dotnet test --filter "ClassName"
 ## Development Guidelines
 
 ### Code Style
-- Modern C# idioms using .NET 9 features
+- Modern C# 14 idioms using .NET 10 features
 - Functional style preferred
-- Concise code sections, minimal unchanged code
-- Brief commit messages (single sentence summary)
 - Unneeded return values should always have explicit discards: `_ = func()`
-
-### Testing
-- All tests use xUnit framework
-- Test files are in `TestPicoArgs/` directory
-- Tests cover argument parsing, validation, and error conditions
 
 ### Library Design Principles
 - Intentionally minimal feature set
