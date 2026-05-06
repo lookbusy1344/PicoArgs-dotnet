@@ -44,7 +44,7 @@ collect_staged_files() {
 run_dotnet_checks() {
   echo "Running pre-commit checks for staged .NET files..."
   dotnet build --configuration Debug --no-restore
-  dotnet format "$SOLUTION_PATH"
+  dotnet format "$SOLUTION_PATH" --verify-no-changes
   gtimeout "$TEST_TIMEOUT_SECONDS" dotnet test --no-restore
 }
 
