@@ -38,7 +38,7 @@ collect_staged_files() {
 
   while IFS= read -r staged_file; do
     [[ -n "$staged_file" ]] && printf '%s\n' "$staged_file"
-  done < <(git diff --cached --name-only --diff-filter=ACMR)
+  done < <(git diff HEAD --name-only --diff-filter=ACMR)
 }
 
 run_dotnet_checks() {
@@ -57,7 +57,7 @@ main() {
   done < <(collect_staged_files)
 
   if [[ "${#staged_files[@]}" -eq 0 ]]; then
-    echo "No staged files found."
+    echo "No modified files found."
     exit 0
   fi
 
@@ -80,7 +80,7 @@ main() {
   fi
 
   if [[ "$has_dotnet_files" == "false" ]]; then
-    echo "No staged .NET source or build files detected. Skipping .NET checks."
+    echo "No modified .NET source or build files detected. Skipping .NET checks."
     exit 0
   fi
 
