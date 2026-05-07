@@ -57,7 +57,7 @@ main() {
   done < <(collect_staged_files)
 
   if [[ "${#staged_files[@]}" -eq 0 ]]; then
-    echo "No staged files found."
+    echo "No modified files found."
     exit 0
   fi
 
@@ -80,7 +80,7 @@ main() {
   fi
 
   if [[ "$has_dotnet_files" == "false" ]]; then
-    echo "No staged .NET source or build files detected. Skipping .NET checks."
+    echo "No modified .NET source or build files detected. Skipping .NET checks."
     exit 0
   fi
 
