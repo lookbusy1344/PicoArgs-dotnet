@@ -38,7 +38,7 @@ collect_staged_files() {
 
   while IFS= read -r staged_file; do
     [[ -n "$staged_file" ]] && printf '%s\n' "$staged_file"
-  done < <(git diff --cached --name-only --diff-filter=ACMR)
+  done < <(git diff HEAD --name-only --diff-filter=ACMR)
 }
 
 run_dotnet_checks() {
