@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "_comment": "Last change: 2026-05-18 19:40 BST — opened up matplotlib / fontconfig / IPython / Jupyter cache paths in the companion .sb profile so notebook execution renders plots without spewing 'no writable cache' warnings into cell outputs.",
   "permission": {
     "read": "allow",
     "edit": "allow",

@@ -1,4 +1,7 @@
 #!/bin/bash
+# Last change: 2026-05-18 19:40 BST — opened up matplotlib / fontconfig /
+# IPython / Jupyter cache paths so notebook execution renders plots
+# without spewing "no writable cache" warnings into cell outputs.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

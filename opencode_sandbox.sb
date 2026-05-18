@@ -1,3 +1,7 @@
+;; Last change: 2026-05-18 19:40 BST — opened up matplotlib / fontconfig /
+;; IPython / Jupyter cache paths so notebook execution renders plots
+;; without spewing "no writable cache" warnings into cell outputs.
+;;
 ;; opencode.sb — macOS Seatbelt profile confining opencode's writes to this project.
 ;;
 ;; Usage:
@@ -214,6 +218,32 @@
 ;; ~/.dotnet/tools.  `pipx install`, `uv tool install`, `pyenv install`
 ;; will fail with EPERM (and are also denied at the bash-permission layer
 ;; for clearer error messages).  Bootstrap toolchains outside the sandbox.
+
+;; --- Writes: Jupyter / IPython / matplotlib / fontconfig caches ---
+;; Required when running notebooks (jupyter nbconvert --execute, jupyter
+;; lab, ipykernel under VS Code, papermill).  IPython wants ~/.ipython
+;; for its profile + history; Jupyter writes runtime + kernel state under
+;; ~/.jupyter and ~/.local/share/jupyter; matplotlib builds a font cache
+;; under ~/.matplotlib (legacy) and ~/.cache/matplotlib (XDG); any plot
+;; that hits libfontconfig populates ~/.cache/fontconfig (~/.fontconfig
+;; on older installs).  All throwaway caches — rebuilt on demand, no
+;; credential value.  Without these, stderr fills with "not writable"
+;; warnings and font scanning re-runs on every notebook execute.
+;;
+;; System-wide /opt/homebrew/var/cache/fontconfig is intentionally NOT
+;; allowed — the user-local cache is sufficient and writing to a
+;; system path would be a sandbox escape vector.
+
+(allow file-write*
+    (subpath (string-append (param "HOME") "/.ipython"))
+    (subpath (string-append (param "HOME") "/.jupyter"))
+    (subpath (string-append (param "HOME") "/.local/share/jupyter"))
+    (subpath (string-append (param "HOME") "/.matplotlib"))
+    (subpath (string-append (param "HOME") "/.cache/matplotlib"))
+    (subpath (string-append (param "HOME") "/.cache/fontconfig"))
+    (subpath (string-append (param "HOME") "/.fontconfig"))
+    (subpath (string-append (param "HOME") "/Library/Caches/matplotlib"))
+    (subpath (string-append (param "HOME") "/Library/Caches/fontconfig")))
 
 ;; --- Writes: opencode's own state ---
 
