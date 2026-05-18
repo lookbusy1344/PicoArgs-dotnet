@@ -61,3 +61,5 @@ gtimeout 60 dotnet test --no-restore
 - Order-dependent argument consumption
 - Manual help generation (no automatic help)
 - All arguments are strings (except flags which are bools)
+
+- **IMPORTANT (all dotnet projects)** Every `dotnet` Bash call (build, test, format, run, restore) must use `dangerouslyDisableSandbox: true`. The Claude Code sandbox blocks `dotnet` even when it appears in `excludedCommands`. Root cause: dotnet + MSBuild use Unix-domain sockets for diagnostic IPC and worker-node communication (`/var/folders/.../dotnet-diagnostic-<pid>-*-socket`, `/private/tmp/MSBuild<pid>`). Sandbox profiles that deny `network-inbound` also block Unix-socket binds, and MSBuild swallows the EPERM into a silent generic build failure with no diagnostic. The same root cause affects opencode Seatbelt profiles — the fix there is to scope `network-inbound` deny to `(remote ip)` only and explicitly allow `(local unix-socket)`.
