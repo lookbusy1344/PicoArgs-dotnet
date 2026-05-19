@@ -1,4 +1,4 @@
-# CLAUDE.md
+# Project Guidelines
 
 ## Project Structure
 
