@@ -1,7 +1,8 @@
 #!/bin/bash
-# Last change: 2026-05-18 19:40 BST — opened up matplotlib / fontconfig /
-# IPython / Jupyter cache paths so notebook execution renders plots
-# without spewing "no writable cache" warnings into cell outputs.
+# Last change: 2026-05-19 08:22 BST — added Node.js / pnpm / npm / yarn
+# cache paths in the companion .sb profile so `pnpm install`, vite,
+# vitest, esbuild and node-gyp work inside the sandbox.  Global bin
+# dirs stay read-only — symmetric with cargo/go/dotnet/pipx.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

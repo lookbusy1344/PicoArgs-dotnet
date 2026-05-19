@@ -1,6 +1,7 @@
-;; Last change: 2026-05-18 19:40 BST — opened up matplotlib / fontconfig /
-;; IPython / Jupyter cache paths so notebook execution renders plots
-;; without spewing "no writable cache" warnings into cell outputs.
+;; Last change: 2026-05-19 08:22 BST — added Node.js / pnpm / npm / yarn / corepack
+;; cache paths so `pnpm install`, vite, vitest, esbuild and node-gyp work
+;; inside the sandbox.  Global bin dirs stay read-only — symmetric with
+;; the cargo/go/dotnet/pipx posture: project deps yes, global tools no.
 ;;
 ;; opencode.sb — macOS Seatbelt profile confining opencode's writes to this project.
 ;;
@@ -218,6 +219,56 @@
 ;; ~/.dotnet/tools.  `pipx install`, `uv tool install`, `pyenv install`
 ;; will fail with EPERM (and are also denied at the bash-permission layer
 ;; for clearer error messages).  Bootstrap toolchains outside the sandbox.
+
+;; --- Writes: Node.js / npm / pnpm / yarn toolchain caches ---
+;; Required for `pnpm install`, `pnpm build`, `pnpm test`, `pnpm dev`,
+;; `npm ci`, `yarn install`, `vite`, `vitest`, `esbuild`, `tsc`, and any
+;; node-gyp native-module builds (e.g. esbuild's optional binaries).
+;; In-project state (node_modules, .vite, dist, .eslintcache) is already
+;; covered by the PROJECT subpath above.
+;;
+;;   - ~/.npm:                    npm's wheel/tarball cache + _logs.
+;;   - ~/.npm-packages, ~/.config/npm:
+;;                                npm CLI config (read-only by default; some
+;;                                first-runs touch it for cache locks).
+;;   - ~/Library/Caches/pnpm:     pnpm metadata + side-effects cache (macOS).
+;;   - ~/Library/pnpm/store:      pnpm's content-addressable global store
+;;                                (the bulk of what `pnpm install` writes).
+;;                                Sibling ~/Library/pnpm holds the global
+;;                                bin shims and is intentionally NOT writable.
+;;   - ~/.local/share/pnpm/store, ~/.pnpm-store:
+;;                                alternative pnpm store locations
+;;                                (XDG-style and legacy).
+;;   - ~/.cache/node, ~/Library/Caches/node-gyp, ~/.node-gyp:
+;;                                node-gyp's headers/binary cache for
+;;                                building native modules.
+;;   - ~/.cache/yarn, ~/Library/Caches/Yarn:
+;;                                yarn 1.x cache.
+;;   - ~/.yarn/berry:             yarn 2+/berry global cache.
+;;   - ~/.cache/node/corepack, ~/Library/Caches/node/corepack:
+;;                                corepack-managed package-manager binaries.
+
+(allow file-write*
+    (subpath (string-append (param "HOME") "/.npm"))
+    (subpath (string-append (param "HOME") "/.config/npm"))
+    (subpath (string-append (param "HOME") "/Library/Caches/pnpm"))
+    (subpath (string-append (param "HOME") "/Library/pnpm/store"))
+    (subpath (string-append (param "HOME") "/.local/share/pnpm/store"))
+    (subpath (string-append (param "HOME") "/.pnpm-store"))
+    (subpath (string-append (param "HOME") "/.cache/node"))
+    (subpath (string-append (param "HOME") "/.node-gyp"))
+    (subpath (string-append (param "HOME") "/Library/Caches/node-gyp"))
+    (subpath (string-append (param "HOME") "/.cache/yarn"))
+    (subpath (string-append (param "HOME") "/Library/Caches/Yarn"))
+    (subpath (string-append (param "HOME") "/.yarn/berry")))
+
+;; NOTE: ~/Library/pnpm (global bin shims) sibling to /store, ~/.npm-global,
+;; ~/.yarn/bin, and ~/.config/yarn/global are intentionally NOT writable —
+;; symmetric with ~/.cargo/bin, ~/go/bin, ~/.dotnet/tools, ~/.local/bin.
+;; `pnpm add -g`, `npm install -g`, `yarn global add` will fail with EPERM
+;; (and are also denied at the bash-permission layer for clearer errors).
+;; corepack shims live at ~/.local/share/node/corepack and are also kept
+;; read-only — bootstrap package managers outside the sandbox.
 
 ;; --- Writes: Jupyter / IPython / matplotlib / fontconfig caches ---
 ;; Required when running notebooks (jupyter nbconvert --execute, jupyter
