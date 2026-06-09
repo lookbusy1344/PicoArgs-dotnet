@@ -1,4 +1,4 @@
-# CLAUDE.md
+# Project Guidelines
 
 ## Project Structure
 
@@ -61,3 +61,5 @@ gtimeout 60 dotnet test --no-restore
 - Order-dependent argument consumption
 - Manual help generation (no automatic help)
 - All arguments are strings (except flags which are bools)
+
+- **IMPORTANT** Every `dotnet` Bash call must set `dangerouslyDisableSandbox: true` (build, test, format, run, restore, publish, and any `gtimeout`-wrapped variants). The Claude Code sandbox blocks `dotnet` even when listed in `excludedCommands`: MSBuild's Unix-domain sockets for diagnostic IPC and worker-node communication fail under `network-inbound` deny, and the EPERM surfaces as a silent generic build failure.

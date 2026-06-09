@@ -5,9 +5,13 @@
 #   chmod +x .git/hooks/pre-commit
 #
 # Or append to an existing .git/hooks/pre-commit:
-#   if [ -x "scripts/pre-commit.sh" ]; then
-#       ./scripts/pre-commit.sh
-#   fi
+# if [ ! -x "scripts/pre-commit.sh" ]; then
+#     echo "Missing executable scripts/pre-commit.sh" >&2
+#     exit 1
+# fi
+#
+# exec ./scripts/pre-commit.sh
+
 
 set -euo pipefail
 
