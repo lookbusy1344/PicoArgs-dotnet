@@ -25,15 +25,14 @@ namespace PicoArgs_dotnet;
 */
 
 /// <summary>
-/// Tiny command line argument parser
+///     Tiny command line argument parser
 /// </summary>
 /// <remarks>
-/// Build a PicoArgs from the command line arguments
+///     Build a PicoArgs from the command line arguments
 /// </remarks>
 public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 {
 	private readonly List<KeyValue> argList = [.. ProcessItems(args, recogniseEquals)];
-	private bool finished;
 
 	// ========= These methods wrap the ReadOnlySpan versions and provide a 'params string[]' interface for .NET 8 =========
 	// ========= They are not needed for .NET 9 or later =========
@@ -46,7 +45,22 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	// ========= End of .NET 8 compatibility methods =========
 
 	/// <summary>
-	/// Get a boolean value from the command line, returns TRUE if found
+	///     Return any unused command line parameters
+	/// </summary>
+	public IReadOnlyList<KeyValue> UnconsumedArgs => argList;
+
+	/// <summary>
+	///     Return true if there are no unused command line parameters
+	/// </summary>
+	public bool IsEmpty => argList.Count == 0;
+
+	/// <summary>
+	///     Return true if Finished() has been called
+	/// </summary>
+	protected bool IsFinished { get; private set; }
+
+	/// <summary>
+	///     Get a boolean value from the command line, returns TRUE if found
 	/// </summary>
 	public bool Contains(ReadOnlySpan<string> options)
 	{
@@ -80,8 +94,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Get multiple parameters from the command line, or empty list if not present
-	/// eg -a value1 -a value2 will yield ["value1", "value2"]
+	///     Get multiple parameters from the command line, or empty list if not present
+	///     eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
 	public IList<string> GetMultipleParams(ReadOnlySpan<string> options)
 	{
@@ -102,16 +116,16 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Get a string value from the command line, throws is not present
-	/// eg -a "value" or --folder "value"
+	///     Get a string value from the command line, throws is not present
+	///     eg -a "value" or --folder "value"
 	/// </summary>
 	public string GetParam(ReadOnlySpan<string> options)
 		=> GetParamOpt(options) ?? throw new PicoArgsException(ErrorCode.MissingRequiredParameter,
 			$"Expected value for \"{string.Join(", ", options.ToArray())}\"");
 
 	/// <summary>
-	/// Get a string value from the command line, or null if not present
-	/// eg -a "value" or --folder "value"
+	///     Get a string value from the command line, or null if not present
+	///     eg -a "value" or --folder "value"
 	/// </summary>
 	public string? GetParamOpt(ReadOnlySpan<string> options)
 	{
@@ -122,7 +136,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Internal version of GetParamOpt, which does not check for valid options
+	///     Internal version of GetParamOpt, which does not check for valid options
 	/// </summary>
 	private string? GetParamInternal(ReadOnlySpan<string> options)
 	{
@@ -172,13 +186,13 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Return and consume the first command line parameter. Throws if not present
+	///     Return and consume the first command line parameter. Throws if not present
 	/// </summary>
 	public string GetCommand() =>
 		GetCommandOpt() ?? throw new PicoArgsException(ErrorCode.MissingCommand, "Expected command");
 
 	/// <summary>
-	/// Return and consume the first command line parameter. Returns null if not present
+	///     Return and consume the first command line parameter. Returns null if not present
 	/// </summary>
 	public string? GetCommandOpt()
 	{
@@ -199,22 +213,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Return any unused command line parameters
-	/// </summary>
-	public IReadOnlyList<KeyValue> UnconsumedArgs => argList;
-
-	/// <summary>
-	/// Return true if there are no unused command line parameters
-	/// </summary>
-	public bool IsEmpty => argList.Count == 0;
-
-	/// <summary>
-	/// Return true if Finished() has been called
-	/// </summary>
-	protected bool IsFinished => finished;
-
-	/// <summary>
-	/// Throw an exception if there are any unused command line parameters
+	///     Throw an exception if there are any unused command line parameters
 	/// </summary>
 	public void Finished()
 	{
@@ -223,21 +222,21 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 				$"Unrecognised parameter(s): {string.Join(", ", argList)}");
 		}
 
-		finished = true;
+		IsFinished = true;
 	}
 
 	/// <summary>
-	/// Ensure that Finished() has not been called
+	///     Ensure that Finished() has not been called
 	/// </summary>
 	private void CheckFinished()
 	{
-		if (finished) {
+		if (IsFinished) {
 			throw new PicoArgsException(ErrorCode.AlreadyFinished, "Cannot use PicoArgs after calling Finished()");
 		}
 	}
 
 	/// <summary>
-	/// Check options are valid for Contains() or GetParam(), eg -a or --action, but not -aa (already expanded) or ---action or --a
+	///     Check options are valid for Contains() or GetParam(), eg -a or --action, but not -aa (already expanded) or ---action or --a
 	/// </summary>
 	private static void ValidatePossibleParams(ReadOnlySpan<string> options)
 	{
@@ -272,8 +271,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Helper function to process the command line arguments. Splits multiple switches into individual switches
-	/// eg -abc becomes -a -b -c
+	///     Helper function to process the command line arguments. Splits multiple switches into individual switches
+	///     eg -abc becomes -a -b -c
 	/// </summary>
 	private static IEnumerable<KeyValue> ProcessItems(IEnumerable<string> args, bool recogniseEquals)
 	{
@@ -308,7 +307,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	}
 
 	/// <summary>
-	/// Validate this input param from command line. Invalid is ---something or --x. Valid options are -a or -ab or --action
+	///     Validate this input param from command line. Invalid is ---something or --x. Valid options are -a or -ab or --action
 	/// </summary>
 	private static void ValidateInputParam(ReadOnlySpan<char> arg)
 	{
@@ -328,19 +327,19 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 }
 
 /// <summary>
-/// Tiny command line argument parser. This version implements IDisposable, and will throw if there are any unused command line parameters
+///     Tiny command line argument parser. This version implements IDisposable, and will throw if there are any unused command line parameters
 /// </summary>
 public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseEquals = true)
 	: PicoArgs(args, recogniseEquals), IDisposable
 {
 	/// <summary>
-	/// If true, suppress the check for unused command line parameters
+	///     If true, suppress the check for unused command line parameters
 	/// </summary>
 	// ReSharper disable once UnusedAutoPropertyAccessor.Global
 	public bool SuppressCheck { get; set; }
 
 	/// <summary>
-	/// Throw an exception if there are any unused command line parameters
+	///     Throw an exception if there are any unused command line parameters
 	/// </summary>
 	public void Dispose()
 	{
@@ -351,12 +350,12 @@ public sealed class PicoArgsDisposable(IEnumerable<string> args, bool recogniseE
 }
 
 /// <summary>
-/// a key and optional identified value eg --key=value becomes "--key" and "value"
+///     a key and optional identified value eg --key=value becomes "--key" and "value"
 /// </summary>
 public readonly record struct KeyValue(string Key, string? Value)
 {
 	/// <summary>
-	/// Build a KeyValue from a string, optionally recognising an equals sign and quotes eg --key=value or --key="value"
+	///     Build a KeyValue from a string, optionally recognising an equals sign and quotes eg --key=value or --key="value"
 	/// </summary>
 	internal static KeyValue Build(string arg, bool recogniseEquals)
 	{
@@ -422,12 +421,10 @@ public readonly record struct KeyValue(string Key, string? Value)
 }
 
 /// <summary>
-/// Exception thrown when there is a problem with the command line arguments
+///     Exception thrown when there is a problem with the command line arguments
 /// </summary>
 public class PicoArgsException : Exception
 {
-	public ErrorCode Code { get; init; }
-
 	public PicoArgsException(ErrorCode code, string message) : base(message) => Code = code;
 
 	public PicoArgsException() { }
@@ -435,10 +432,11 @@ public class PicoArgsException : Exception
 	public PicoArgsException(string message) : base(message) { }
 
 	public PicoArgsException(string message, Exception innerException) : base(message, innerException) { }
+	public ErrorCode Code { get; init; }
 }
 
 /// <summary>
-/// Error codes for PicoArgs exceptions
+///     Error codes for PicoArgs exceptions
 /// </summary>
 public enum ErrorCode
 {
@@ -451,5 +449,5 @@ public enum ErrorCode
 	UnrecognisedParameters,
 	AlreadyFinished,
 	UnexpectedValue,
-	InvalidParameter
+	InvalidParameter,
 }

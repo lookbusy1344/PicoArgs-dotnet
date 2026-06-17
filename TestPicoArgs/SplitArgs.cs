@@ -1,6 +1,7 @@
 // #define WIN32_CALLS
 
 // ReSharper disable RedundantAssignment
+
 namespace TestPicoArgs;
 
 // ReSharper disable once RedundantUsingDirective
@@ -16,18 +17,18 @@ using PicoArgs_dotnet;
 internal static class SplitArgs
 {
 	/// <summary>
-	/// Build a PicoArgs from a single command line arguments
+	///     Build a PicoArgs from a single command line arguments
 	/// </summary>
 	internal static PicoArgs BuildFromSingleString(string line, bool recogniseEquals = true) =>
 		new(SplitArgumentsLine(line), recogniseEquals);
 
 	/// <summary>
-	/// Build a PicoArgsDisposable from a single command line arguments
+	///     Build a PicoArgsDisposable from a single command line arguments
 	/// </summary>
 	internal static PicoArgsDisposable BuildDisposableFromSingleString(string line) => new(SplitArgumentsLine(line));
 
 	/// <summary>
-	/// Split a command line into arguments (adds "echo" to the front to handle the case where the first argument is quoted)
+	///     Split a command line into arguments (adds "echo" to the front to handle the case where the first argument is quoted)
 	/// </summary>
 	private static IEnumerable<string> SplitArgumentsLine(string line) =>
 		SplitArgsImplementation.CommandLineToArgvW($"echo {line}").Skip(1);

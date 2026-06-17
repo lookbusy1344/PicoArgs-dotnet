@@ -2,10 +2,10 @@ namespace TestPicoArgs;
 
 using PicoArgs_dotnet;
 
-internal static partial class Helpers
+internal static class Helpers
 {
 	/// <summary>
-	/// Try the action, and assert that it throws the expected exception
+	///     Try the action, and assert that it throws the expected exception
 	/// </summary>
 	public static void AssertThrows<E>(Action action, string errMsg) where E : Exception
 	{
@@ -18,7 +18,7 @@ internal static partial class Helpers
 	}
 
 	/// <summary>
-	/// Try the action, and assert that it throws the expected PicArgsException and code
+	///     Try the action, and assert that it throws the expected PicArgsException and code
 	/// </summary>
 	public static void AssertPicoThrows(Action action, string errMsg, ErrorCode? code)
 	{
@@ -47,7 +47,7 @@ internal static partial class Helpers
 	}
 
 	/// <summary>
-	/// Try the action, and if it throws the expected exception, return true
+	///     Try the action, and if it throws the expected exception, return true
 	/// </summary>
 	public static bool CheckThrows<E>(Action action) where E : Exception
 	{
@@ -68,7 +68,7 @@ internal static partial class Helpers
 	}
 
 	/// <summary>
-	/// Compare the lengths, and sort and compare the collections
+	///     Compare the lengths, and sort and compare the collections
 	/// </summary>
 	public static bool CompareNames(ICollection<string> a, ICollection<string> b)
 		=> a.Count == b.Count
