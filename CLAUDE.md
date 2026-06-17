@@ -9,6 +9,7 @@ PicoArgs-dotnet is a single-file command line argument parser library for .NET, 
 - `TestPicoArgs/` - xUnit test project
 
 Key architectural concepts:
+
 - Single-file library design with no external dependencies
 - Order-dependent argument consumption (consumed arguments are removed)
 - Uses `ReadOnlySpan<string>` parameters in .NET 9 for performance optimization
@@ -17,6 +18,7 @@ Key architectural concepts:
 ## Common Commands
 
 ### Build and Test
+
 ```bash
 dotnet restore
 dotnet build --configuration Debug --no-restore
@@ -25,12 +27,14 @@ dotnet format PicoArgs-dotnet.sln
 ```
 
 ### Run the demo application
+
 ```bash
 dotnet run -- --help
 dotnet run -- --raw -i file1.txt -i file2.txt --exclude something
 ```
 
 ### Run specific tests
+
 ```bash
 dotnet test --filter "TestMethodName"
 dotnet test --filter "ClassName"
@@ -51,15 +55,19 @@ gtimeout 60 dotnet test --no-restore
 ## Development Guidelines
 
 ### Code Style
+
 - Modern C# 14 idioms using .NET 10 features
 - Functional style preferred
 - Unneeded return values should always have explicit discards: `_ = func()`
 
 ### Library Design Principles
+
 - Intentionally minimal feature set
 - Single file with no dependencies
 - Order-dependent argument consumption
 - Manual help generation (no automatic help)
 - All arguments are strings (except flags which are bools)
 
-- **IMPORTANT** Every `dotnet` Bash call must set `dangerouslyDisableSandbox: true` (build, test, format, run, restore, publish, and any `gtimeout`-wrapped variants). The Claude Code sandbox blocks `dotnet` even when listed in `excludedCommands`: MSBuild's Unix-domain sockets for diagnostic IPC and worker-node communication fail under `network-inbound` deny, and the EPERM surfaces as a silent generic build failure.
+- **IMPORTANT** Every `dotnet` Bash call must set `dangerouslyDisableSandbox: true` (build, test, format, run, restore, publish, and any `gtimeout`
+  -wrapped variants). The Claude Code sandbox blocks `dotnet` even when listed in `excludedCommands`: MSBuild's Unix-domain sockets for diagnostic IPC
+  and worker-node communication fail under `network-inbound` deny, and the EPERM surfaces as a silent generic build failure.

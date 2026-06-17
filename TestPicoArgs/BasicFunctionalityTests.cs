@@ -1,7 +1,5 @@
 namespace TestPicoArgs;
 
-using PicoArgs_dotnet;
-
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0053 // Use expression body for lambda expression
 #pragma warning disable IDE0200 // Remove unnecessary lambda expression

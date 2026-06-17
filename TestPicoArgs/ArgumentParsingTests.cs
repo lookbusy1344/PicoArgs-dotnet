@@ -76,7 +76,7 @@ public class ArgumentParsingTests
 	{
 		KeyValue[] expected = [
 			new("--file", "file1.txt"), new("--print", null),
-			new("something", null), new("--verbose", "yes")
+			new("something", null), new("--verbose", "yes"),
 		];
 		var pico = SplitArgs.BuildFromSingleString("--file=file1.txt --print something --verbose=yes");
 

@@ -5,14 +5,16 @@
 
 A tiny command line argument parser for dotnet, inspired by the Rust pico-args library https://github.com/RazrFalcon/pico-args
 
-Like the Rust library, this library is intended to be used for small command line tools, where you don't want to use a full blown argument parser like CommandLineParser https://github.com/commandlineparser/commandline
+Like the Rust library, this library is intended to be used for small command line tools, where you don't want to use a full blown argument parser like
+CommandLineParser https://github.com/commandlineparser/commandline
 
 PicoArgs-dotnet's features are intentionally very minimal:
 
 - Only one file to add, no dependencies, very compact
 - Supports flags, options and positional arguments
 - Supports equivalent short and long options `-p` alias for `--print`
-- Supports combining short flags, e.g. `-abc` is equivalent to `-a` `-b` `-c` including with a trailing parameter `-abc=code` same as `-a` `-b` `-c code`
+- Supports combining short flags, e.g. `-abc` is equivalent to `-a` `-b` `-c` including with a trailing parameter `-abc=code` same as `-a` `-b`
+  `-c code`
 - Supports multiple values for options `-f file1 -f file2`
 - Tiny API, a couple of hundred lines of code
 - Unit tests included
@@ -23,9 +25,11 @@ Some intentional limitations:
 - NO support for default help generation, you need to do this manually
 - NO support for conversions, all arguments are strings (all flags are bools) unless you convert them yourself
 
-Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been consumed, you can check for any unexpected arguments with ```Finished()```.
+Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been
+consumed, you can check for any unexpected arguments with ```Finished()```.
 
 ## Usage
+
 No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code:
 
 ```csharp
@@ -41,7 +45,6 @@ pico.Finished(); // we are finished, check for extra unwanted arguments & throw 
 ```
 
 More examples can be found in the ```Program.cs``` file.
-
 
 There is a ```PicoArgsDisposable``` class which implements ```IDisposable``` to automatically throw on extra params. This may be to your taste:
 
@@ -87,7 +90,9 @@ private static ConfigOptions ParseConfig(string[] args)
 
 ## .NET 9/10 improvements with ReadOnlySpan
 
-In .NET 9/10 the API has been updated to use `params ReadOnlySpan<string> options` instead of `params string[] options`. Since possible command line options are almost always constant, this allows great optimization by using stack-allocated inline arrays of strings, instead of heap-allocated arrays. The generated code then looks something like this:
+In .NET 9/10 the API has been updated to use `params ReadOnlySpan<string> options` instead of `params string[] options`. Since possible command line
+options are almost always constant, this allows great optimization by using stack-allocated inline arrays of strings, instead of heap-allocated
+arrays. The generated code then looks something like this:
 
 ```csharp
 // .NET 10 VERSION

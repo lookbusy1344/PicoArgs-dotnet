@@ -57,8 +57,8 @@ internal static class Program
 #pragma warning disable IDE0051 // Remove unused private members
 
 	/// <summary>
-	/// Alternative usage to the example in Main() above.
-	/// This wraps the parsing of the command line, and returns the results as a tuple.
+	///     Alternative usage to the example in Main() above.
+	///     This wraps the parsing of the command line, and returns the results as a tuple.
 	/// </summary>
 	private static (bool help, DirectoryInfo folder, string pattern, bool verbose) ParseCommandLineWrapper(
 		string[] args)
@@ -82,12 +82,12 @@ internal static class Program
 	}
 
 	private const string HelpMessage = """
-	                                   Usage: PicoArgs-dotnet.exe [options]
+									   Usage: PicoArgs-dotnet.exe [options]
 
-	                                   Options:
-	                                     -f, --file <filename>     File(s) to search (required)
-	                                     -e, --exclude <pattern>   Exclude pattern (default 'example-exclude')
-	                                     -r, --raw                 Raw output
-	                                     -h, --help, -?            Help information
-	                                   """;
+									   Options:
+									     -f, --file <filename>     File(s) to search (required)
+									     -e, --exclude <pattern>   Exclude pattern (default 'example-exclude')
+									     -r, --raw                 Raw output
+									     -h, --help, -?            Help information
+									   """;
 }

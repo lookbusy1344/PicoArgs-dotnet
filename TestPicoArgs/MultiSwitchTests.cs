@@ -60,7 +60,7 @@ public class MultiSwitchTests
 	[Fact(DisplayName = "Multiple combined switches and param with equals")]
 	public void MultiSwitchAndParamEquals()
 	{
-		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc=codename", true);
+		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc=codename");
 
 		var file = pico.GetParam("-f", "--file");
 		var code = pico.GetParam("-c", "--code");
@@ -81,7 +81,7 @@ public class MultiSwitchTests
 	[Fact(DisplayName = "Multi switch with quotes")]
 	public void MultiSwitchWithQuotes()
 	{
-		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc='codename' --another", true);
+		var pico = SplitArgs.BuildFromSingleString("--file=hello -abc='codename' --another");
 
 		var file = pico.GetParam("-f", "--file");
 		var code = pico.GetParam("-c", "--code");
