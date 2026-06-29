@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
 	https://github.com/lookbusy1344/PicoArgs-dotnet
 
-	Version 3.5.1 - 19 Jan 2026
+	Version 3.6.0 - 29 Jun 2026
 
 	Example usage:
 
@@ -13,7 +13,7 @@ namespace PicoArgs_dotnet;
 	string? patternOpt = pico.GetParamOpt("-t", "--pattern");  // optional parameter
 	string pattern = pico.GetParamOpt("-t", "--pattern") ?? "*.txt";  // optional parameter with default
 	string requirePath = pico.GetParam("-p", "--path");  // mandatory parameter, throws if not present
-	IList<string> files = pico.GetMultipleParams("-f", "--file");  // get multiple parameters eg -f file1 -f file2
+	IReadOnlyList<string> files = pico.GetMultipleParams("-f", "--file");  // get multiple parameters eg -f file1 -f file2
 	string command = pico.GetCommand();  // first parameter, throws if not present
 	string? commandOpt = pico.GetCommandOpt();  // first parameter, null if not present
 
@@ -87,7 +87,7 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 	///     Get multiple parameters from the command line, or empty list if not present
 	///     eg -a value1 -a value2 will yield ["value1", "value2"]
 	/// </summary>
-	public IList<string> GetMultipleParams(params ReadOnlySpan<string> options)
+	public IReadOnlyList<string> GetMultipleParams(params ReadOnlySpan<string> options)
 	{
 		ValidatePossibleParams(options);
 		CheckFinished();
@@ -413,15 +413,14 @@ public readonly record struct KeyValue(string Key, string? Value)
 /// <summary>
 ///     Exception thrown when there is a problem with the command line arguments
 /// </summary>
-public class PicoArgsException : Exception
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1032:Implement standard exception constructors",
+	Justification = "Only ever thrown internally, always with an ErrorCode.")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1194:Implement exception constructors",
+	Justification = "Only ever thrown internally, always with an ErrorCode.")]
+public sealed class PicoArgsException : Exception
 {
 	public PicoArgsException(ErrorCode code, string message) : base(message) => Code = code;
 
-	public PicoArgsException() { }
-
-	public PicoArgsException(string message) : base(message) { }
-
-	public PicoArgsException(string message, Exception innerException) : base(message, innerException) { }
 	public ErrorCode Code { get; init; }
 }
 
