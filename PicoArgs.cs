@@ -415,13 +415,9 @@ public readonly record struct KeyValue(string Key, string? Value)
 /// </summary>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1032:Implement standard exception constructors",
 	Justification = "Only ever thrown internally, always with an ErrorCode.")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1194:Implement exception constructors",
-	Justification = "Only ever thrown internally, always with an ErrorCode.")]
-public sealed class PicoArgsException : Exception
+public sealed class PicoArgsException(ErrorCode code, string message) : Exception(message)
 {
-	public PicoArgsException(ErrorCode code, string message) : base(message) => Code = code;
-
-	public ErrorCode Code { get; init; }
+	public ErrorCode Code { get; init; } = code;
 }
 
 /// <summary>
