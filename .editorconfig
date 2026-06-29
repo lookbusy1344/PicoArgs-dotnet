@@ -241,45 +241,44 @@ dotnet_diagnostic.RCS1001.severity = none
 dotnet_diagnostic.RCS1003.severity = none
 dotnet_diagnostic.rcs1004.severity = none       # Redundant with native csharp_prefer_braces
 
-# Roslynator Mutes (Muted in favor of matching native .NET/VSTHRD rules)
+# Roslynator Mutes (muted only where an enabled native .NET/VSTHRD/CA rule covers the same case)
 dotnet_diagnostic.rcs1213.severity = none # same as IDE0051 (Remove unused private members)
 dotnet_diagnostic.rcs1163.severity = none # same as IDE0060 (Remove unused parameter)
 dotnet_diagnostic.rcs1169.severity = none # same as IDE0044 (Make field read-only)
-dotnet_diagnostic.rcs1016.severity = none # same as IDE0001 / IDE0002 (Simplify name / Access expression)
-dotnet_diagnostic.rcs1093.severity = none # same as IDE0003 / IDE0009 (Remove redundant 'this' qualifier)
-dotnet_diagnostic.rcs1102.severity = none # same as IDE0040 (Add/remove accessibility modifiers)
-dotnet_diagnostic.rcs1021.severity = none # same as IDE0053 (Use expression body for lambda)
-dotnet_diagnostic.rcs1085.severity = none # Handled natively by dotnet_style_prefer_auto_properties / IDE0032
-dotnet_diagnostic.rcs1206.severity = none # same as IDE0078 / IDE0083 (Use pattern matching instead of is/as)
-dotnet_diagnostic.rcs1179.severity = none # same as IDE0063 (Use simple 'using' statement)
-dotnet_diagnostic.rcs1182.severity = none # same as IDE0034 (Simplify 'default' expression)
-dotnet_diagnostic.rcs1155.severity = none # same as CA1827 / CA1828 (Use Any() instead of Count() > 0)
-dotnet_diagnostic.rcs1246.severity = none # same as CA1860 (Avoid Enumerable.Any() for collections with Length/Count)
-dotnet_diagnostic.rcs1077.severity = none # same as CA1825 (Avoid zero-length array allocations / Array.Empty<T>())
-dotnet_diagnostic.rcs1046.severity = none # same as VSTHRD200 (Use Async suffix on async methods)
-dotnet_diagnostic.rcs1047.severity = none # same as VSTHRD200 (Asynchronous method name should end with Async)
-dotnet_diagnostic.rcs1224.severity = none # same as CA2244 / VSTHRD103 (Call ConfigureAwait / Task blocking overlaps)
+dotnet_diagnostic.rcs1021.severity = none # same as IDE0053 / csharp_style_expression_bodied_lambdas
+dotnet_diagnostic.rcs1085.severity = none # same as IDE0032 / dotnet_style_prefer_auto_properties (Use auto-property)
+dotnet_diagnostic.rcs1016.severity = none # overlaps csharp_style_expression_bodied_* (IDE0022/IDE0023/IDE0024...)
+dotnet_diagnostic.rcs1102.severity = none # same as CA1052 (Make class static; Design category enabled)
+dotnet_diagnostic.rcs1206.severity = none # same as IDE0031 / dotnet_style_null_propagation (Use conditional access)
+dotnet_diagnostic.rcs1179.severity = none # same as IDE0059 / csharp_style_unused_value_assignment_preference
+dotnet_diagnostic.rcs1246.severity = none # same as CA1826 (Use indexer/property over Enumerable; Performance enabled)
 dotnet_diagnostic.rcs1194.severity = none # same as CA1032 (Implement standard exception constructors)
-dotnet_diagnostic.rcs0044.severity = none # Muted: Conflicts with global end_of_line=lf preference
-dotnet_diagnostic.rcs1080.severity = none # Muted: Inverted logic conflict with active rcs1155/CA1827 choices
+dotnet_diagnostic.rcs1046.severity = none # same as VSTHRD200 (Async method name should end with 'Async')
+dotnet_diagnostic.rcs0044.severity = none # conflicts with global end_of_line=lf (would request CRLF)
+dotnet_diagnostic.rcs1080.severity = none # conflicts with CA1827 (CA prefers Any(); rcs1080 prefers Count/Length)
 
 # Explicit Active Roslynator Suggestions
 dotnet_diagnostic.rcs0042.severity = suggestion # Put auto-accessors on a single line
 dotnet_diagnostic.rcs0054.severity = suggestion # Fix formatting of a call chain
 dotnet_diagnostic.rcs0055.severity = suggestion # Fix formatting of a binary expression chain
+dotnet_diagnostic.rcs1047.severity = suggestion # Non-asynchronous method name should not end with 'Async'
 dotnet_diagnostic.rcs1070.severity = suggestion # Remove redundant default switch section
+dotnet_diagnostic.rcs1077.severity = suggestion # Optimize LINQ method call
+dotnet_diagnostic.rcs1093.severity = suggestion # File contains no code
 dotnet_diagnostic.rcs1133.severity = suggestion # Remove redundant Dispose/Close call
 dotnet_diagnostic.rcs1134.severity = suggestion # Remove redundant statement
 dotnet_diagnostic.rcs1136.severity = suggestion # Merge switch sections with equivalent content
 dotnet_diagnostic.rcs1145.severity = suggestion # Remove redundant 'as' operator
 dotnet_diagnostic.rcs1151.severity = suggestion # Remove redundant cast
+dotnet_diagnostic.rcs1155.severity = suggestion # Use StringComparison when comparing strings
 dotnet_diagnostic.rcs1162.severity = suggestion # Avoid chain of assignments
 dotnet_diagnostic.rcs1165.severity = suggestion # Unconstrained type parameter checked for null
-dotnet_diagnostic.rcs1168.severity = suggestion # Remove redundant base interface
 dotnet_diagnostic.rcs1174.severity = suggestion # Remove redundant async/await
+dotnet_diagnostic.rcs1182.severity = suggestion # Remove redundant base interface
 dotnet_diagnostic.rcs1198.severity = suggestion # Avoid unnecessary boxing of value type
 dotnet_diagnostic.rcs1201.severity = suggestion # Use method chaining
 dotnet_diagnostic.rcs1211.severity = suggestion # Remove unnecessary 'else'
+dotnet_diagnostic.rcs1224.severity = suggestion # Make method an extension method
 dotnet_diagnostic.rcs1238.severity = suggestion # Avoid nested ?: operators
 dotnet_diagnostic.rcs1241.severity = suggestion # Implement non-generic counterpart
 dotnet_diagnostic.rcs1252.severity = suggestion # Normalize usage of infinite loop
