@@ -15,6 +15,11 @@
 
 set -euo pipefail
 
+# GUI git clients launch hooks with a minimal PATH that omits the user-local
+# dotnet install and Homebrew binaries (gtimeout). Add the common locations so
+# the hook resolves the same tools as an interactive shell.
+export PATH="$HOME/.dotnet:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 readonly SOLUTION_PATH="PicoArgs-dotnet.sln"
 readonly TEST_TIMEOUT_SECONDS="60"
 

@@ -70,7 +70,7 @@ internal static class Helpers
 	/// <summary>
 	///     Compare the lengths, and sort and compare the collections
 	/// </summary>
-	public static bool CompareNames(ICollection<string> a, ICollection<string> b)
+	public static bool CompareNames(IReadOnlyCollection<string> a, IReadOnlyCollection<string> b)
 		=> a.Count == b.Count
 		   && a.Order().SequenceEqual(b.Order());
 }
