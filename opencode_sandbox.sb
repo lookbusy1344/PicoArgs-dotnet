@@ -58,7 +58,7 @@
 ;; pick up the weakened policy — defeating the whole "config-as-code,
 ;; reviewable in git" posture.  Same shape for opencode_sandbox.json (the
 ;; in-process policy loaded via OPENCODE_CONFIG that the agent can otherwise
-;; edit), sandbox.sh (the launcher), and CLAUDE.md (the agent's standing
+;; edit), sandbox.sh (the launcher), and AGENTS.md (the agent's standing
 ;; instructions, an attractive rewrite target).  opencode.json and
 ;; .opencode.json are also listed even though they shouldn't exist here —
 ;; defence against an agent dropping a permissive auto-loaded config that
@@ -74,7 +74,7 @@
     (literal (string-append (param "PROJECT") "/opencode.json"))
     (literal (string-append (param "PROJECT") "/.opencode.json"))
     (literal (string-append (param "PROJECT") "/sandbox.sh"))
-    (literal (string-append (param "PROJECT") "/CLAUDE.md"))
+    (literal (string-append (param "PROJECT") "/AGENTS.md"))
     (subpath (string-append (param "GITROOT") "/.git/hooks")))
 
 ;; --- Writes: Swift / SwiftPM toolchain caches ---
