@@ -1,3 +1,0 @@
-@echo off
-echo Running tests...
-dotnet test TestPicoArgs\TestPicoArgs.csproj
