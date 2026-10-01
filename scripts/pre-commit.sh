@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-# Install with:
+# Works in jj and plain Git checkouts.
+#
+# jj: no commit hooks, so run it directly before `jj commit`, `jj describe`
+# (finalising) and `jj squash`. It checks the files changed in `@`.
+#
+# Git: install as a hook, it checks the files changed against HEAD:
 #   ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit
 #   chmod +x .git/hooks/pre-commit
 #
@@ -42,12 +47,20 @@ requires_dotnet_checks() {
     || [[ "$path" == *.targets ]]
 }
 
+changed_files() {
+  if [[ -z "${GIT_INDEX_FILE:-}" ]] && jj --ignore-working-copy root > /dev/null 2>&1; then
+    jj diff --name-only -r @ --no-pager
+  else
+    git diff HEAD --name-only --diff-filter=ACMR
+  fi
+}
+
 collect_staged_files() {
   local staged_file
 
   while IFS= read -r staged_file; do
     [[ -n "$staged_file" ]] && printf '%s\n' "$staged_file"
-  done < <(git diff HEAD --name-only --diff-filter=ACMR)
+  done < <(changed_files)
 }
 
 run_dotnet_checks() {

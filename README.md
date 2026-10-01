@@ -28,6 +28,10 @@ Some intentional limitations:
 Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been
 consumed, you can check for any unexpected arguments with ```Finished()```.
 
+## Jujutsu
+
+This repo is managed with Jujutsu rather than Git. Try it out! https://docs.jj-vcs.dev/latest/
+
 ## Usage
 
 No nuget packages, just add ```PicoArgs.cs``` to your project. Then in your code:
