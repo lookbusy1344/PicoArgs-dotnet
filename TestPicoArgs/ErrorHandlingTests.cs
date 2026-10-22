@@ -134,4 +134,17 @@ public class ErrorHandlingTests
 			var fail = SplitArgs.BuildFromSingleString("-x ---another");
 		}, "Should not parse ---another", ErrorCode.InvalidParameter);
 	}
+
+	[Theory(DisplayName = "Switch with empty name before equals, like -=value, is rejected")]
+	[InlineData("-=junk", true)]
+	[InlineData("-=junk", false)]
+	[InlineData("-=", true)]
+	[InlineData("--=junk", true)]
+	[InlineData("--=junk", false)]
+	public void EmptySwitchNameBeforeEquals(string arg, bool recogniseEquals)
+	{
+		var ex = Assert.Throws<PicoArgsException>(() => new PicoArgs(["-i", "a.txt", arg], recogniseEquals));
+		Assert.Equal(ErrorCode.InvalidParameter, ex.Code);
+		Assert.Equal($"Switch name is empty: {arg}", ex.Message);
+	}
 }

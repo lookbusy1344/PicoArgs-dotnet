@@ -313,6 +313,11 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			throw new PicoArgsException(ErrorCode.InvalidParameter,
 				$"Long options must be 2 characters or more: {arg}");
 		}
+
+		if (arg.StartsWith("-=") || arg.StartsWith("--=")) {
+			// eg -=value or --=value has no switch name
+			throw new PicoArgsException(ErrorCode.InvalidParameter, $"Switch name is empty: {arg}");
+		}
 	}
 }
 
