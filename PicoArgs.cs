@@ -191,9 +191,9 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			return null;
 		}
 
-		// check for a switch, a single dash '-' or double-dash '--' is ok
+		// check for a switch, a single dash '-', double-dash '--' or negative number is ok
 		var cmd = argList[0].Key;
-		if (cmd != "-" && cmd != "--" && cmd.StartsWith('-')) {
+		if (cmd != "-" && cmd != "--" && cmd.StartsWith('-') && !IsNegativeNumber(cmd)) {
 			throw new PicoArgsException(ErrorCode.InvalidCommand, $"Expected command not \"{cmd}\"");
 		}
 
@@ -269,8 +269,8 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 		foreach (var arg in args) {
 			ValidateInputParam(arg);
 
-			if (arg == "-" || !arg.StartsWith('-')) {
-				// not a switch, or just a single dash
+			if (arg == "-" || !arg.StartsWith('-') || IsNegativeNumber(arg)) {
+				// not a switch, just a single dash, or a negative number like -10
 				yield return KeyValue.Build(arg, false);
 				continue;
 			}
@@ -295,6 +295,14 @@ public class PicoArgs(IEnumerable<string> args, bool recogniseEquals = true)
 			}
 		}
 	}
+
+	/// <summary>
+	///     True for a negative number such as -10, -1.5 or -.5. A digit or '.' must follow the dash, so -Infinity and -NaN are switches
+	/// </summary>
+	private static bool IsNegativeNumber(string arg) =>
+		arg.Length > 1
+		&& (char.IsAsciiDigit(arg[1]) || arg[1] == '.')
+		&& double.TryParse(arg, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _);
 
 	/// <summary>
 	///     Validate this input param from command line. Invalid is ---something or --x. Valid options are -a or -ab or --action

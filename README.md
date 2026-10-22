@@ -15,6 +15,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Supports equivalent short and long options `-p` alias for `--print`
 - Supports combining short flags, e.g. `-abc` is equivalent to `-a` `-b` `-c` including with a trailing parameter `-abc=code` same as `-a` `-b`
   `-c code`
+- Negative numbers such as `-10`, `-1.5` or `-1e3` stay whole and are not split into switches, so `-n -10` gives `-n` the value `-10`
 - Supports multiple values for options `-f file1 -f file2`
 - Tiny API, a couple of hundred lines of code
 - Unit tests included
@@ -24,6 +25,7 @@ Some intentional limitations:
 
 - NO support for default help generation, you need to do this manually
 - NO support for conversions, all arguments are strings (all flags are bools) unless you convert them yourself
+- A value that starts with a dash and is not a number must use `=`. `-i -rf` splits into `-i -r -f`; write `-i=-rf` instead
 
 Order of argument consumption is important. Once consumed an argument is removed from the available list. Once all your expected arguments have been
 consumed, you can check for any unexpected arguments with ```Finished()```.
