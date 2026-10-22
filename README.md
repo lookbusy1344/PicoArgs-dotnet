@@ -1,6 +1,6 @@
 # PicoArgs-dotnet
 
-[![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml)
+[![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/main.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/main.yml)
 [![CodeQL](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/github-code-scanning/codeql)
 
 A tiny command line argument parser for dotnet, inspired by the Rust pico-args library https://github.com/RazrFalcon/pico-args
@@ -161,6 +161,6 @@ See https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-9/#spa
 
 ## Tests
 
-[![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/test.yml)
+[![PicoArgs compile and test](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/main.yml/badge.svg)](https://github.com/lookbusy1344/PicoArgs-dotnet/actions/workflows/main.yml)
 
 Tests are written using xUnit and can be run with `dotnet test`.
