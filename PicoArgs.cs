@@ -3,7 +3,7 @@ namespace PicoArgs_dotnet;
 /*  PICOARGS_DOTNET - a tiny command line argument parser for .NET
 	https://github.com/lookbusy1344/PicoArgs-dotnet
 
-	Version 3.6.0 - 29 Jun 2026
+	Version 3.6.1 - 22 Oct 2026
 
 	Example usage:
 
