@@ -19,7 +19,7 @@ PicoArgs-dotnet's features are intentionally very minimal:
 - Supports multiple values for options `-f file1 -f file2`
 - Tiny API, a couple of hundred lines of code
 - Unit tests included
-- Current Support for .NET 10 (main branch) and .NET 8 (dotnet8 branch). Unmaintained .NET 7 code is at 7bb0f2c6 and .NET 9 code at 3ca1d101
+- Current Support for .NET 11 (main branch), .NET 10 (dotnet10 branch) and .NET 8 (dotnet8 branch). Unmaintained .NET 7 code is at 7bb0f2c6 and .NET 9 code at 3ca1d101
 
 Some intentional limitations:
 
@@ -96,12 +96,12 @@ private static ConfigOptions ParseConfig(string[] args)
 
 ## .NET 9/10 improvements with ReadOnlySpan
 
-In .NET 9/10 the API has been updated to use `params ReadOnlySpan<string> options` instead of `params string[] options`. Since possible command line
+In .NET 9 and later the API has been updated to use `params ReadOnlySpan<string> options` instead of `params string[] options`. Since possible command line
 options are almost always constant, this allows great optimization by using stack-allocated inline arrays of strings, instead of heap-allocated
 arrays. The generated code then looks something like this:
 
 ```csharp
-// .NET 10 VERSION
+// .NET 11 VERSION
 
 // As-written code:
 bool raw = pico.Contains("-r", "--raw");

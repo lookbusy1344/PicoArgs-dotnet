@@ -74,7 +74,7 @@ gtimeout 60 dotnet test --no-restore
 
 ### Code Style
 
-- Modern C# 14 idioms using .NET 10 features
+- Modern C# 15 idioms using .NET 11 features
 - Functional style preferred
 - Unneeded return values should always have explicit discards: `_ = func()`
 
