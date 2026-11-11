@@ -8,16 +8,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-
-        <AnalysisModeDesign>All</AnalysisModeDesign>
-        <AnalysisModeSecurity>All</AnalysisModeSecurity>
-        <AnalysisModePerformance>All</AnalysisModePerformance>
-        <AnalysisModeReliability>All</AnalysisModeReliability>
-        <AnalysisModeUsage>All</AnalysisModeUsage>
-    </PropertyGroup>
-
     <ItemGroup>
         <Compile Remove="TestPicoArgs\**" />
         <EmbeddedResource Remove="TestPicoArgs\**" />

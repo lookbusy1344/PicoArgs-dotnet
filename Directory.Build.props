@@ -1,0 +1,12 @@
+<Project>
+	<PropertyGroup>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+		<CheckSdkVulnerabilities>true</CheckSdkVulnerabilities>
+	</PropertyGroup>
+</Project>
